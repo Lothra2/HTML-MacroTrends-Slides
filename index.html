@@ -177,7 +177,7 @@ select.reg-sel option{background:#060A45;color:#fff}
 .q-sub{font-size:9px;color:var(--gray);margin-top:3px;max-width:380px;line-height:1.5}
 .q-body{flex:1;display:grid;grid-template-columns:1fr 230px;gap:12px;min-height:0}
 .q-chart{position:relative;min-height:0}
-.q-side{display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.q-side{display:flex;flex-direction:column;gap:8px;overflow:hidden;min-height:0}
 .regime{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:4px;padding:10px 12px;border-left:3px solid rgba(255,255,255,.15)}
 .regime.hot{border-left-color:var(--orange)}.regime.warm{border-left-color:var(--yellow)}.regime.cool{border-left-color:var(--green)}.regime.hl{background:rgba(45,109,246,.08);border-left-color:var(--blue)}
 .regime-lbl{font-size:8px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px}
@@ -457,6 +457,13 @@ select.cmp-sel option{background:#060A45}
         <div class="regime hot"><div class="regime-lbl" style="color:var(--orange)">🔴 Hyperinflation &gt;15%</div><div class="regime-chips" id="r4hot"></div></div>
         <div class="regime warm"><div class="regime-lbl" style="color:var(--yellow)">🟡 High Inflation 7–15%</div><div class="regime-chips" id="r4warm"></div></div>
         <div class="regime cool"><div class="regime-lbl" style="color:var(--green)">🟢 Stable &lt;4% · Invest</div><div class="regime-chips" id="r4cool"></div></div>
+        <div style="flex:1;min-height:0;background:rgba(45,109,246,.07);border:1px solid rgba(45,109,246,.3);border-left:3px solid var(--blue);border-radius:4px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+            <span style="font-size:7.5px;font-weight:800;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase">✦ So What for Retailers</span>
+            <button class="gen-btn" style="font-size:7px;padding:3px 8px" onclick="genInsight(5)">✦ Generate</button>
+          </div>
+          <div id="ai-growth" style="font-size:9.5px;color:rgba(255,255,255,.75);line-height:1.6;overflow-y:auto;flex:1;min-height:0">Select a country and click Generate for growth vs inflation retailer implications.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -768,6 +775,7 @@ function updateAll(){
    ['ai5','Generate an AI insight for digital retail strategy recommendations.'],
    ['ai6','Click Generate in the Retailer Profile panel for a full AI-powered demographic analysis.'],
    ['ai7t','Click Generate for AI retailer analysis of this market signal'],
+   ['ai-growth','Select a country and click Generate for growth vs inflation retailer implications.'],
    ['ai7b','Select a country and click Generate above for a tailored retailer strategy narrative.'],
    ['ai7s','Retailer implications will appear after generation.'],
    ['ai7w','Key indicator will appear after generation.'],
@@ -1256,6 +1264,7 @@ Market Signal: ${d.sig} | Context: ${d.ins}`;
 
   const focusMap = {
     3: 'macro context and what it means for retailer revenue, traffic, and basket size',
+    5: 'growth vs inflation quadrant positioning and what it means for retailer pricing strategy, format investment, and when to enter or defend this market',
     4: 'Big Mac Index pricing position and what it means for retailer pricing architecture, private label strategy, and SKU mix',
     6: 'e-commerce penetration, digital channel strategy, and what retailers must do in online and omnichannel',
     7: 'demographic profile and its direct implications for retailer assortment, store format, and category mix',
@@ -1352,7 +1361,7 @@ function applyInsight(sn,p){
     document.getElementById('ai7b').textContent=n;
     document.getElementById('ai7s').textContent=s;
   } else {
-    const idMap={3:'ai2',4:'ai3',6:'ai5'};
+    const idMap={3:'ai2',4:'ai3',5:'ai-growth',6:'ai5'};
     const el=document.getElementById(idMap[sn]);
     if(el)el.innerHTML=fmt(t,n,s);
     document.getElementById('ai7t').textContent=t;
