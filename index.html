@@ -285,12 +285,30 @@ select.cmp-sel option{background:#060A45}
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(45,109,246,.35);border-radius:2px}
+
+/* ── API KEY MODAL ─────────────────────────────────────────────── */
+#api-modal{position:fixed;inset:0;background:rgba(4,6,26,.92);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px)}
+#api-modal.hidden{display:none}
+.modal-box{background:#060A45;border:1px solid rgba(45,109,246,.4);border-radius:8px;padding:36px 40px;width:480px;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+.modal-logo{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.modal-logo-sq{width:32px;height:32px;background:#2D6DF6;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff}
+.modal-title{font-size:18px;font-weight:900;color:#fff;margin-bottom:6px}
+.modal-sub{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:24px;line-height:1.6}
+.modal-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;display:block}
+.modal-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(45,109,246,.4);border-radius:5px;color:#fff;font-family:'Consolas',monospace;font-size:12px;padding:12px 14px;outline:none;transition:border .15s;box-sizing:border-box}
+.modal-input:focus{border-color:#2D6DF6}
+.modal-hint{font-size:10px;color:rgba(255,255,255,.3);margin-top:8px;margin-bottom:24px}
+.modal-hint a{color:#2D6DF6;text-decoration:none}
+.modal-hint a:hover{text-decoration:underline}
+.modal-btn{width:100%;background:#2D6DF6;border:none;color:#fff;font-family:inherit;font-size:12px;font-weight:800;padding:14px;border-radius:5px;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;transition:background .15s}
+.modal-btn:hover{background:#1a5be0}
+.modal-error{font-size:10px;color:#EF5F17;margin-top:10px;display:none}
 </style>
 </head>
 <body>
 <div id="app">
 <div id="topbar">
-  <div class="logo"><div class="logo-sq">NiQ</div><div><span class="logo-name">NielsenIQ</span><span class="logo-tag">Market Insights · 2025</span></div></div>
+  <div class="logo"><div class="logo-sq">NIQ</div><div><span class="logo-name">NielsenIQ</span><span class="logo-tag">Market Insights · 2025</span></div></div>
   <div class="sep"></div>
   <div class="ctrl"><span class="ctrl-lbl">Region</span><select class="sel" id="selRegion"></select></div>
   <div class="ctrl"><span class="ctrl-lbl">Country</span><select class="sel" id="selCountry" style="min-width:175px"></select></div>
@@ -305,7 +323,8 @@ select.cmp-sel option{background:#060A45}
     </select>
   </div>
   <div class="sep"></div>
-  <button id="pdf-btn" onclick="exportPDF()" style="margin-left:8px;flex-shrink:0;display:flex;align-items:center;gap:6px;background:rgba(89,173,0,.15);border:1px solid rgba(89,173,0,.5);color:#59AD00;font-family:inherit;font-size:10px;font-weight:800;padding:8px 16px;border-radius:4px;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;transition:all .15s;white-space:nowrap;">⬇ Save PDF</button>
+  <button onclick="document.getElementById('api-modal').classList.remove('hidden');switchTab('enter');" title="Change API Key" style="flex-shrink:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);font-family:inherit;font-size:11px;padding:6px 10px;border-radius:4px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='#2D6DF6';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,.15)';this.style.color='rgba(255,255,255,.5)'">🔑</button>
+<button id="pdf-btn" onclick="exportPDF()" style="margin-left:8px;flex-shrink:0;display:flex;align-items:center;gap:6px;background:rgba(89,173,0,.15);border:1px solid rgba(89,173,0,.5);color:#59AD00;font-family:inherit;font-size:10px;font-weight:800;padding:8px 16px;border-radius:4px;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;transition:all .15s;white-space:nowrap;">⬇ Save PDF</button>
 <button id="ai-btn" onclick="genInsight()">✦ Generate AI Insight</button>
 </div>
 <div id="stage"><div id="scaler"><div id="deck">
@@ -1152,7 +1171,7 @@ function buildCoverFlags(){
 /* ══════════════════════════════════════════════════════════════════════
    AI — Anthropic API
 ══════════════════════════════════════════════════════════════════════ */
-const GROQ_KEY='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';
+let GROQ_KEY = ''; // Set at runtime via API key modal
 const AURL='https://api.groq.com/openai/v1/chat/completions';
 
 async function callAPI(prompt, maxTokens){
@@ -1219,25 +1238,7 @@ async function genInsight(forSlide){
         +'(3) most important channel shift across the region; '
         +'(4) single biggest risk for retail operators. '
         +'Be specific, use the numbers above.';
-      const res = await fetch(AURL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + GROQ_KEY
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          max_tokens: 600,
-          temperature: 0.8,
-          messages: [{role: 'user', content: prompt}]
-        })
-      });
-      if(!res.ok){
-        const et = await res.text();
-        throw new Error('Groq '+res.status+': '+et.substring(0,150));
-      }
-      const json = await res.json();
-      const text = json.choices?.[0]?.message?.content || '';
+      const text = await callAPI(prompt, 600);
       if(aiEl) aiEl.textContent = text || 'No response received.';
     } catch(e){
       console.error('Regional insight error:', e);
@@ -1245,10 +1246,10 @@ async function genInsight(forSlide){
     } finally {
       if(btn) btn.disabled = false;
     }
-    return; // Done — don't run country-slide logic
+    return;
   }
 
-  /* ── COUNTRY SLIDE INSIGHTS (sn 3–10) ──────────────────── */
+    /* ── COUNTRY SLIDE INSIGHTS (sn 3–10) ──────────────────── */
   const d = CUR;
   setLoading(sn, true);
 
@@ -1350,6 +1351,16 @@ function applyInsight(sn,p){
     if(p.macro_card)document.getElementById('tk1').textContent=p.macro_card;
     if(p.tension_card)document.getElementById('tk2').textContent=p.tension_card;
     if(p.action_card)document.getElementById('tk3').textContent=p.action_card;
+    // Store backup so PDF capture can restore this content
+    window._s10backup={
+      title:t,body:n,sw:s,
+      watch:p.watch_signal||'—',
+      channel:p.channel_priority||'—',
+      risk:p.key_risk||'—',
+      tk1:p.macro_card||(document.getElementById('tk1')?document.getElementById('tk1').textContent:''),
+      tk2:p.tension_card||(document.getElementById('tk2')?document.getElementById('tk2').textContent:''),
+      tk3:p.action_card||(document.getElementById('tk3')?document.getElementById('tk3').textContent:'')
+    };
   } else if(sn===8){
     document.getElementById('ai7t').textContent=t;
     document.getElementById('ai7b').textContent=n;
@@ -1359,6 +1370,8 @@ function applyInsight(sn,p){
     // Demographics: update profile box + insight box
     document.getElementById('s6prof').textContent=n;
     document.getElementById('ai6').innerHTML=fmt(t,'',s);
+    // Store backup for PDF capture
+    window._s7backup = { prof:n, ai6:fmt(t,'',s) };
     // Also update s7 mirror
     document.getElementById('ai7t').textContent=t;
     document.getElementById('ai7b').textContent=n;
@@ -1542,13 +1555,20 @@ async function exportPDF(){
   ];
 
   // Step 1: Generate all AI insights
+  window._s10backup = null; // reset before generation
+  window._s7backup = null;
   for(let i=0; i<slideAI.length; i++){
     const item = slideAI[i];
     btn.textContent = '✦ AI ' + (i+1) + '/' + slideAI.length + ' generating...';
     goTo(item.n);
-    await new Promise(r => setTimeout(r, 300)); // let slide render
-    await item.fn();
-    await new Promise(r => setTimeout(r, 400)); // let content settle
+    await new Promise(r => setTimeout(r, 500)); // let slide render fully
+    try {
+      await item.fn();
+    } catch(e) {
+      console.warn('AI generation failed for slide', item.n, e);
+    }
+    // Extra wait for slide 10 — fullest generation
+    await new Promise(r => setTimeout(r, item.n === 10 ? 1200 : 700));
   }
 
   // Step 2: Capture each slide
@@ -1575,16 +1595,39 @@ async function exportPDF(){
     else if(n===4) renderS3();
     else if(n===5) renderS4();
     else if(n===6) renderS5();
-    else if(n===7) renderS6_pdf(); // PDF-safe: preserves AI content in s6prof
+    else if(n===7){
+      renderS6_pdf();
+      // Restore demographics AI content
+      if(window._s7backup){
+        const el=document.getElementById('s6prof'); if(el) el.textContent=window._s7backup.prof;
+        const ai=document.getElementById('ai6'); if(ai) ai.innerHTML=window._s7backup.ai6;
+      }
+    }
     else if(n===8) renderS7();
     else if(n===9) renderCmp();
-    // n===10: do NOT call renderS9/buildTkCards — preserve AI content
+    else if(n===10){
+      if(window._s10backup){
+        // Restore AI-generated content
+        const b = window._s10backup;
+        const set = (id,v) => { const el=document.getElementById(id); if(el && v) el.textContent=v; };
+        set('tk-title', b.title); set('tk-body', b.body); set('tk-sw', b.sw);
+        set('tk-watch', b.watch); set('tk-channel', b.channel); set('tk-risk', b.risk);
+        set('tk1', b.tk1); set('tk2', b.tk2); set('tk3', b.tk3);
+        console.log('Slide 10: AI content restored from backup ✓');
+      } else {
+        // No AI backup — render static cards as fallback
+        buildTkCards(CUR);
+        console.warn('Slide 10: No AI backup found, using static content');
+      }
+    }
   }
 
   for(let n=1; n<=TOTAL; n++){
     btn.textContent = '📸 Slide ' + n + '/' + TOTAL + '...';
     goToPDF(n);
-    await new Promise(r => setTimeout(r, 350)); // let charts render
+    // Slide 10 needs extra time — AI content must be fully rendered
+    const waitMs = n === 10 ? 800 : 400;
+    await new Promise(r => setTimeout(r, waitMs));
 
     const canvas = await html2canvas(deck, {
       scale: 2,
@@ -1641,6 +1684,52 @@ function renderS6_pdf(){
 }
 
 
+/* ── API KEY MODAL LOGIC ──────────────────────────────────────── */
+function switchTab(tab){
+  const enterTab = document.getElementById('tab-enter');
+  const helpTab = document.getElementById('tab-help');
+  const enterPanel = document.getElementById('panel-enter');
+  const helpPanel = document.getElementById('panel-help');
+  if(tab === 'help'){
+    enterTab.style.borderBottomColor = 'transparent';
+    enterTab.style.color = 'rgba(255,255,255,.4)';
+    helpTab.style.borderBottomColor = '#2D6DF6';
+    helpTab.style.color = '#fff';
+    enterPanel.style.display = 'none';
+    helpPanel.style.display = 'block';
+  } else {
+    helpTab.style.borderBottomColor = 'transparent';
+    helpTab.style.color = 'rgba(255,255,255,.4)';
+    enterTab.style.borderBottomColor = '#2D6DF6';
+    enterTab.style.color = '#fff';
+    helpPanel.style.display = 'none';
+    enterPanel.style.display = 'block';
+    setTimeout(()=>{ const inp=document.getElementById('modal-key-input'); if(inp)inp.focus(); }, 50);
+  }
+}
+
+function submitApiKey(){
+  const input = document.getElementById('modal-key-input');
+  const key = input.value.trim();
+  const err = document.getElementById('modal-error');
+  if(!key.startsWith('gsk_') || key.length < 20){
+    err.style.display = 'block';
+    input.focus();
+    return;
+  }
+  GROQ_KEY = key;
+  document.getElementById('api-modal').classList.add('hidden');
+}
+
+// Allow Enter key to submit
+document.addEventListener('DOMContentLoaded', function(){
+  const input = document.getElementById('modal-key-input');
+  if(input) input.addEventListener('keydown', function(e){
+    if(e.key === 'Enter') submitApiKey();
+  });
+});
+
+
 window.onload=function(){
   buildSelects();
   buildCoverFlags();
@@ -1653,5 +1742,71 @@ window.onload=function(){
 };
 
 </script>
+
+<!-- API KEY MODAL -->
+<div id="api-modal">
+  <div class="modal-box" style="width:520px">
+    <div class="modal-logo">
+      <div class="modal-logo-sq">NIQ</div>
+      <span style="font-size:14px;font-weight:800;color:#fff">NielsenIQ · Retailer Intelligence</span>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid rgba(45,109,246,.25)">
+      <button id="tab-enter" onclick="switchTab('enter')" style="font-family:inherit;background:none;border:none;border-bottom:2px solid #2D6DF6;color:#fff;font-size:11px;font-weight:800;padding:8px 20px 10px;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;margin-bottom:-1px">🔑 Enter Key</button>
+      <button id="tab-help" onclick="switchTab('help')" style="font-family:inherit;background:none;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,.4);font-size:11px;font-weight:800;padding:8px 20px 10px;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;margin-bottom:-1px">❓ How to Get One</button>
+    </div>
+
+    <!-- Tab: Enter Key -->
+    <div id="panel-enter">
+      <div class="modal-title">Enter your Groq API Key</div>
+      <div class="modal-sub">Your key is used only in this session — never stored, never shared.<br>It stays in memory and disappears when you close the browser.</div>
+      <label class="modal-label">Groq API Key</label>
+      <input class="modal-input" id="modal-key-input" type="password" placeholder="gsk_..." autocomplete="off" spellcheck="false"/>
+      <div class="modal-hint">Free key at <a href="https://console.groq.com" target="_blank">console.groq.com</a> — no credit card needed &nbsp;·&nbsp; <a href="#" onclick="switchTab('help');return false;">How to get one →</a></div>
+      <button class="modal-btn" onclick="submitApiKey()">Launch Dashboard →</button>
+      <div class="modal-error" id="modal-error">Key must start with gsk_ — please check and try again.</div>
+    </div>
+
+    <!-- Tab: How to Get One -->
+    <div id="panel-help" style="display:none">
+      <div class="modal-title">Get your free Groq API Key</div>
+      <div class="modal-sub" style="margin-bottom:20px">Takes 2 minutes. No credit card required. 14,400 free requests/day.</div>
+
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:#2D6DF6;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;margin-top:1px">1</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:3px">Go to Groq Console</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.6">Open <a href="https://console.groq.com" target="_blank" style="color:#2D6DF6;font-weight:700">console.groq.com</a> in a new tab. Click <b style="color:#fff">Sign Up</b> — you can use your Google or GitHub account to register in seconds.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:#2D6DF6;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;margin-top:1px">2</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:3px">Create an API Key</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.6">In the left sidebar click <b style="color:#fff">API Keys</b>, then click <b style="color:#31D1FF">Create API Key</b>. Give it any name (e.g. "NIQ Dashboard") and click <b style="color:#fff">Submit</b>.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:#2D6DF6;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;margin-top:1px">3</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:3px">Copy and paste it here</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.6">Your key starts with <b style="color:#31D1FF;font-family:Consolas,monospace">gsk_</b> — copy it immediately (Groq only shows it once). Switch to the <b style="color:#fff">Enter Key</b> tab and paste it to launch the dashboard.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(89,173,0,.2);border:1px solid #59AD00;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px">✓</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#59AD00;margin-bottom:3px">Free tier — what you get</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.5);line-height:1.6">14,400 requests/day · 6,000 tokens/min · No credit card · Resets daily. More than enough for daily dashboard use and PDF exports.</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="modal-btn" onclick="switchTab('enter')" style="background:rgba(45,109,246,.2);border:1px solid rgba(45,109,246,.5);">← Back to Enter Key</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
