@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NIQ · Global FMCG Retailer Intelligence · 2025</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');
 /* Emoji font fallback for flags in all browsers */
@@ -303,7 +305,8 @@ select.cmp-sel option{background:#060A45}
     </select>
   </div>
   <div class="sep"></div>
-  <button id="ai-btn" onclick="genInsight()">✦ Generate AI Insight</button>
+  <button id="pdf-btn" onclick="exportPDF()" style="margin-left:8px;flex-shrink:0;display:flex;align-items:center;gap:6px;background:rgba(89,173,0,.15);border:1px solid rgba(89,173,0,.5);color:#59AD00;font-family:inherit;font-size:10px;font-weight:800;padding:8px 16px;border-radius:4px;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;transition:all .15s;white-space:nowrap;">⬇ Save PDF</button>
+<button id="ai-btn" onclick="genInsight()">✦ Generate AI Insight</button>
 </div>
 <div id="stage"><div id="scaler"><div id="deck">
 
@@ -1513,6 +1516,129 @@ async function genRegionInsight(){
   }
 }
 
+
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   PDF EXPORT
+══════════════════════════════════════════════════════════════════════ */
+async function exportPDF(){
+  const btn = document.getElementById('pdf-btn');
+  const aiBtn = document.getElementById('ai-btn');
+  btn.disabled = true;
+  aiBtn.disabled = true;
+  btn.textContent = '⏳ Preparing...';
+
+  // Slide → AI function mapping
+  const slideAI = [
+    { n:2,  fn:()=>genInsight(2)  },
+    { n:3,  fn:()=>genInsight(3)  },
+    { n:4,  fn:()=>genInsight(4)  },
+    { n:5,  fn:()=>genInsight(5)  },
+    { n:6,  fn:()=>genInsight(6)  },
+    { n:7,  fn:()=>genInsight(7)  },
+    { n:8,  fn:()=>genInsight(8)  },
+    { n:10, fn:()=>genInsight(10) },
+  ];
+
+  // Step 1: Generate all AI insights
+  for(let i=0; i<slideAI.length; i++){
+    const item = slideAI[i];
+    btn.textContent = '✦ AI ' + (i+1) + '/' + slideAI.length + ' generating...';
+    goTo(item.n);
+    await new Promise(r => setTimeout(r, 300)); // let slide render
+    await item.fn();
+    await new Promise(r => setTimeout(r, 400)); // let content settle
+  }
+
+  // Step 2: Capture each slide
+  btn.textContent = '📸 Capturing slides...';
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation:'landscape', unit:'px', format:[1280,720], compress:true });
+  const deck = document.getElementById('deck');
+  const scaler = document.getElementById('scaler');
+
+  // Save current scale and set to 1:1 for capture
+  const savedTransform = scaler.style.transform;
+  scaler.style.transform = 'scale(1)';
+  scaler.style.transformOrigin = 'top left';
+
+  // PDF-safe navigation: switch slide without calling initSlide (preserves AI content)
+  function goToPDF(n){
+    document.getElementById('s'+SLIDE).classList.remove('on');
+    SLIDE = Math.max(1, Math.min(n, TOTAL));
+    document.getElementById('s'+SLIDE).classList.add('on');
+    buildNav();
+    // Only re-render chart slides that need it, never overwrite AI content
+    if(n===2) renderRegion();
+    else if(n===3) renderS2();
+    else if(n===4) renderS3();
+    else if(n===5) renderS4();
+    else if(n===6) renderS5();
+    else if(n===7) renderS6_pdf(); // PDF-safe: preserves AI content in s6prof
+    else if(n===8) renderS7();
+    else if(n===9) renderCmp();
+    // n===10: do NOT call renderS9/buildTkCards — preserve AI content
+  }
+
+  for(let n=1; n<=TOTAL; n++){
+    btn.textContent = '📸 Slide ' + n + '/' + TOTAL + '...';
+    goToPDF(n);
+    await new Promise(r => setTimeout(r, 350)); // let charts render
+
+    const canvas = await html2canvas(deck, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#060A45',
+      width: 1280,
+      height: 720,
+      logging: false,
+    });
+
+    const imgData = canvas.toDataURL('image/png', 1.0);
+    if(n > 1) pdf.addPage([1280,720], 'landscape');
+    pdf.addImage(imgData, 'PNG', 0, 0, 1280, 720);
+  }
+
+  // Restore scale
+  scaler.style.transform = savedTransform;
+  scaler.style.transformOrigin = 'center center';
+
+  // Step 3: Save
+  const today = new Date();
+  const dateStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  const country = CUR ? CUR.c.replace(/\s+/g,'_') : 'Global';
+  pdf.save('NIQ_FMCG_Retailer_Intelligence_' + country + '_' + dateStr + '.pdf');
+
+  // Restore UI
+  btn.disabled = false;
+  aiBtn.disabled = false;
+  btn.textContent = '⬇ Save PDF';
+
+  // Go back to slide 1
+  goTo(1);
+}
+
+function renderS6_pdf(){
+  // PDF-safe: only update KPIs and chart, skip static text that overwrites AI content
+  const d=CUR;
+  document.getElementById('s6age').textContent=d.a;
+  document.getElementById('s6pop').textContent=d.p+'M';
+  document.getElementById('s6un').textContent=d.un+'%';
+  const pct=((d.a-18)/(49-18)*100).toFixed(0);
+  const col=d.a<28?'#EF5F17':d.a<38?'#FFB500':d.a<45?'#2D6DF6':'#31D1FF';
+  const bar=document.getElementById('s6agebar');
+  bar.style.width=pct+'%';bar.style.background=col;
+  const ageSorted=[...D].sort((a,b)=>a.a-b.a);
+  dc('c6');
+  CH.c6=new Chart(document.getElementById('c6'),{type:'bar',
+    data:{labels:ageSorted.map(x=>x.f),datasets:[{data:ageSorted.map(x=>x.a),
+      backgroundColor:ageSorted.map(x=>x.c===d.c?'rgba(45,109,246,.9)':'rgba(255,255,255,.15)'),borderRadius:2}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>[ageSorted[ctx.dataIndex].c+': '+ageSorted[ctx.dataIndex].a+' yrs',ageSorted[ctx.dataIndex].sig]}}},
+      scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>v+' yrs',font:{size:8}},grid:{color:'rgba(255,255,255,.05)'}}}}});
+}
 
 
 window.onload=function(){
