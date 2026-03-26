@@ -1176,25 +1176,41 @@ const AURL='https://api.groq.com/openai/v1/chat/completions';
 
 async function callAPI(prompt, maxTokens){
   maxTokens = maxTokens || 1000;
-  const res = await fetch(AURL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + GROQ_KEY
-    },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      max_tokens: maxTokens,
-      temperature: 0.8,
-      messages: [{role: 'user', content: prompt}]
-    })
-  });
-  if(!res.ok){
-    const errText = await res.text();
-    throw new Error('Groq ' + res.status + ': ' + errText.substring(0,150));
+  const makeReq = async () => {
+    const res = await fetch(AURL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + GROQ_KEY
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        max_tokens: maxTokens,
+        temperature: 0.7,
+        messages: [{role: 'user', content: prompt}]
+      })
+    });
+    if(res.status === 429){
+      // Rate limit — wait and retry once
+      const retryAfter = parseInt(res.headers.get('retry-after') || '5');
+      const waitSec = Math.max(retryAfter, 5);
+      console.log('Rate limited — waiting ' + waitSec + 's before retry...');
+      await new Promise(r => setTimeout(r, waitSec * 1000));
+      return null; // signal retry
+    }
+    if(!res.ok){
+      const errText = await res.text();
+      throw new Error('Groq ' + res.status + ': ' + errText.substring(0,150));
+    }
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || '';
+  };
+  // Try up to 3 times
+  for(let attempt = 0; attempt < 3; attempt++){
+    const result = await makeReq();
+    if(result !== null) return result;
   }
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content || '';
+  throw new Error('Rate limit persists after 3 retries. Try again in a minute.');
 }
 
 
@@ -1554,21 +1570,102 @@ async function exportPDF(){
     { n:10, fn:()=>genInsight(10) },
   ];
 
-  // Step 1: Generate all AI insights
-  window._s10backup = null; // reset before generation
+  // Step 1: Generate all AI insights (bypass setLoading to avoid button state issues)
+  window._s10backup = null;
   window._s7backup = null;
+
+  async function genForPDF(sn) {
+    const d = CUR;
+    const ecR = [...D].sort((a,b)=>b.ec-a.ec).findIndex(x=>x.c===d.c)+1;
+    const gR  = [...D].sort((a,b)=>b.g-a.g).findIndex(x=>x.c===d.c)+1;
+
+    // Slide 2: regional insight (plain text)
+    if(sn === 2) {
+      const aiEl = document.getElementById('ai-reg');
+      const regSel = document.getElementById('regSel');
+      const regCode = regSel ? regSel.value : 'APAC';
+      const regName = RL[regCode] || regCode;
+      const mkt = D.filter(x => x.r === regCode);
+      const avg = k => (mkt.reduce((s,x)=>s+x[k],0)/mkt.length).toFixed(1);
+      const topEc = [...mkt].sort((a,b)=>b.ec-a.ec)[0];
+      const topGr = [...mkt].sort((a,b)=>b.gr-a.gr)[0];
+      const topGdp= [...mkt].sort((a,b)=>b.g-a.g)[0];
+      const lines = mkt.map(m=>m.c+' | Growth:'+m.gr+'% | Inflation:'+m.inf+'% | E-Comm:'+m.ec+'% | Signal:'+m.sig).join('\n');
+      const prompt = 'You are a NielsenIQ senior retail analyst. Write 4-5 sentences for retail leadership.\n\n'
+        +'REGION: '+regName+' ('+mkt.length+' markets)\n'
+        +'Avg Growth: '+avg('gr')+'% | Avg Inflation: '+avg('inf')+'% | Avg E-Comm: '+avg('ec')+'%\n'
+        +'Top E-Commerce: '+topEc.c+' ('+topEc.ec+'%) | Fastest Growth: '+topGr.c+' ('+topGr.gr+'%)\n'
+        +'Highest GDP PPP: '+topGdp.c+' ($'+(topGdp.g/1000).toFixed(0)+'K)\n\n'
+        +'MARKETS:\n'+lines+'\n\n'
+        +'Cover: (1) dominant macro retail trend in '+regName+' 2025 with numbers; (2) top 2-3 markets for retailer growth; (3) most important channel shift; (4) single biggest risk for retail operators. Be specific.';
+      const text = await callAPI(prompt, 600);
+      if(aiEl) aiEl.textContent = text || 'No response.';
+      return;
+    }
+
+    // All other slides: JSON response
+    const data = 'RETAILER INTELLIGENCE BRIEF — '+d.c+' ('+RL[d.r]+') — 2025\n'
+      +'GDP PPP: $'+d.g.toLocaleString()+' — ranked #'+gR+'/43\n'
+      +'Real GDP Growth: '+d.gr+'% | CPI Inflation: '+d.inf+'%\n'
+      +'Big Mac: $'+d.bm+' ('+((d.bi>0?'+':'')+d.bi)+'% vs US $6.12)\n'
+      +'E-Commerce FMCG: '+d.ec+'% — ranked #'+ecR+'/43\n'
+      +'Urbanization: '+d.u+'% | Median Age: '+d.a+' yrs | Population: '+d.p+'M\n'
+      +'Unemployment: '+d.un+'% | Private Consumption: '+d.pc+'% of GDP\n'
+      +'Market Signal: '+d.sig+' | Context: '+d.ins;
+
+    const focusMap = {
+      3:'macro context and what it means for retailer revenue, traffic, and basket size',
+      4:'Big Mac Index pricing position and what it means for retailer pricing architecture and SKU mix',
+      5:'growth vs inflation quadrant positioning and what it means for retailer pricing strategy and format investment',
+      6:'e-commerce penetration, digital channel strategy, and what retailers must do in online and omnichannel',
+      7:'demographic profile and its direct implications for retailer assortment, store format, and category mix',
+      8:'FMCG market signal classification and strategic retailer portfolio decisions',
+      10:'complete retailer strategy synthesis'
+    };
+
+    let prompt;
+    if(sn === 10) {
+      prompt = 'You are a NielsenIQ senior retail analyst writing a strategic brief for APAC commercial leadership.\n\n'+data
+        +'\n\nReturn ONLY valid JSON (no markdown, no backticks):\n'
+        +'{"slide_title":"10-14 word retailer-focused headline for '+d.c+' 2025",'
+        +'"narrative":"5-6 sentences covering macro dynamics, pricing signals, e-commerce, demographics, and #1 structural shift retailers must make. Use specific numbers.",'
+        +'"so_what":"3 sentences on what retailers must do differently in '+d.c+' vs global playbook.",'
+        +'"watch_signal":"2 sentences on the most important indicator to track.",'
+        +'"macro_card":"2-3 sentences on GDP/inflation and retail traffic impact.",'
+        +'"tension_card":"2-3 sentences on the core structural tension for retailers.",'
+        +'"action_card":"2-3 sentences on the #1 action retailers must take in 12 months.",'
+        +'"channel_priority":"2 sentences on which retail channel deserves most investment.",'
+        +'"key_risk":"2 sentences on the biggest risk to retail growth."}';
+    } else if(sn === 8) {
+      prompt = 'You are a NielsenIQ retail analyst. Analyze the market signal for RETAILERS.\n\n'+data
+        +'\n\nReturn ONLY valid JSON:\n{"slide_title":"headline for '+d.sig+' in '+d.c+'","narrative":"4-5 sentences on format performance, shopping behavior, channel winners/losers, pricing power","so_what":"3 sentences on retail portfolio decisions","watch_signal":"2 sentences on what will change this signal"}';
+    } else if(sn === 7) {
+      prompt = 'You are a NielsenIQ retail analyst. Analyze demographics for RETAILERS.\n\n'+data
+        +'\n\nReturn ONLY valid JSON:\n{"slide_title":"headline about median age '+d.a+' for retailers in '+d.c+'","narrative":"4-5 sentences on trip behavior, store formats, category mix, channel preference","so_what":"3 sentences on specific retailer decisions","watch_signal":"2 sentences on demographic trend"}';
+    } else {
+      const focus = focusMap[sn] || focusMap[3];
+      prompt = 'You are a NielsenIQ retail analyst. Focus on '+focus+'.\n\n'+data
+        +'\n\nReturn ONLY valid JSON:\n{"slide_title":"10-14 word headline for '+d.c+' 2025","narrative":"4-5 analytical sentences on '+focus+' with specific numbers and retailer implications","so_what":"3 sentences on specific retailer actions"}';
+    }
+
+    const raw = await callAPI(prompt, sn === 10 ? 2000 : 1200);
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch(e) { const m=raw.match(/\{[\s\S]*\}/); if(m) parsed=JSON.parse(m[0]); else throw new Error('parse failed'); }
+    applyInsight(sn, parsed);
+  }
+
   for(let i=0; i<slideAI.length; i++){
     const item = slideAI[i];
-    btn.textContent = '✦ AI ' + (i+1) + '/' + slideAI.length + ' generating...';
+    btn.textContent = '✦ AI ' + (i+1) + '/' + slideAI.length + '...';
     goTo(item.n);
-    await new Promise(r => setTimeout(r, 500)); // let slide render fully
+    await new Promise(r => setTimeout(r, 500));
     try {
-      await item.fn();
+      await genForPDF(item.n);
     } catch(e) {
-      console.warn('AI generation failed for slide', item.n, e);
+      console.warn('PDF AI failed for slide', item.n, ':', e.message);
     }
-    // Extra wait for slide 10 — fullest generation
-    await new Promise(r => setTimeout(r, item.n === 10 ? 1200 : 700));
+    await new Promise(r => setTimeout(r, 2000)); // 2s gap to avoid rate limits
   }
 
   // Step 2: Capture each slide
