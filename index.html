@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIQ · Global FMCG Retailer Intelligence · 2025</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');
+/* Emoji font fallback for flags in all browsers */
+.cv-flag, .ms-flag, .reg-card-flag, .bm-f, .rank-f, .crit-icon,
+.tk-flag, #s7f, #s9f { font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif; }
+
+:root {
+  --blue:    #2D6DF6;
+  --deep:    #060A45;
+  --white:   #FFFFFF;
+  --bg:      #F0F2F8;
+  --gray:    #999999;
+  --lblue:   #31D1FF;
+  --orange:  #EF5F17;
+  --green:   #59AD00;
+  --pink:    #EF5890;
+  --yellow:  #FFB500;
+  --card:    rgba(255,255,255,.05);
+  --card2:   rgba(255,255,255,.09);
+  --border:  rgba(255,255,255,.1);
+  --text:    #FFFFFF;
+  --muted:   rgba(255,255,255,.55);
+  --dim:     rgba(255,255,255,.3);
+  --red:     #EF5F17;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#04061A;font-family:'Segoe UI',system-ui,sans-serif;color:var(--text)}
+#app{display:flex;flex-direction:column;width:100vw;height:100vh}
+#topbar{flex-shrink:0;height:50px;background:var(--deep);border-bottom:2px solid var(--blue);display:flex;align-items:center;gap:10px;padding:0 20px;position:relative;z-index:100;}
+.logo{display:flex;align-items:center;gap:9px;margin-right:8px;flex-shrink:0}
+.logo-sq{width:28px;height:28px;background:var(--blue);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff;letter-spacing:-.5px}
+.logo-name{font-size:14px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.logo-tag{font-size:7px;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;display:block}
+.sep{width:1px;height:26px;background:rgba(255,255,255,.12);flex-shrink:0}
+.ctrl{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.ctrl-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+select.sel{font-family:inherit;background:rgba(255,255,255,.08);border:1px solid rgba(45,109,246,.5);color:#fff;font-size:11px;font-weight:500;padding:5px 26px 5px 9px;border-radius:4px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath d='M0 0l4.5 5L9 0z' fill='%232D6DF6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;transition:border-color .15s;min-width:130px;}
+select.sel:hover{border-color:var(--blue)}
+select.sel option{background:#060A45;color:#fff}
+#ai-btn{margin-left:auto;flex-shrink:0;display:flex;align-items:center;gap:6px;background:var(--blue);border:none;color:#fff;font-family:inherit;font-size:10px;font-weight:800;padding:8px 16px;border-radius:4px;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;transition:background .15s,transform .15s;white-space:nowrap;box-shadow:0 2px 12px rgba(45,109,246,.4);}
+#ai-btn:hover{background:#1a5be0;transform:translateY(-1px)}
+#ai-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+#stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#04061A;position:relative;}
+#scaler{transform-origin:center center;position:relative}
+#deck{width:1280px;height:720px;position:relative;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 0 1px rgba(45,109,246,.2);}
+.slide{position:absolute;inset:0;background:var(--deep);opacity:0;pointer-events:none;transition:opacity .3s ease;overflow:hidden;}
+.slide.on{opacity:1;pointer-events:all}
+.s-hdr{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;background:rgba(6,10,69,.85);border-bottom:1px solid rgba(45,109,246,.25);z-index:10;}
+.s-hdr-l{display:flex;align-items:center;gap:9px}
+.s-badge{width:22px;height:22px;background:var(--blue);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:#fff;}
+.s-sec{font-size:9px;font-weight:700;color:var(--lblue);letter-spacing:1.5px;text-transform:uppercase}
+.s-hdr-r{font-size:8px;color:var(--dim)}
+.s-body{position:absolute;top:52px;bottom:32px;left:0;right:0;overflow:hidden}
+.s-foot{position:absolute;bottom:0;left:0;right:0;height:32px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;background:rgba(6,10,69,.7);border-top:1px solid rgba(45,109,246,.15);}
+.s-foot span{font-size:8px;color:var(--dim)}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:5px}
+.card-blue{background:rgba(45,109,246,.08);border:1px solid rgba(45,109,246,.3);border-radius:4px}
+.card-orange{background:rgba(239,95,23,.07);border:1px solid rgba(239,95,23,.3);border-radius:4px}
+.card-green{background:rgba(89,173,0,.07);border:1px solid rgba(89,173,0,.3);border-radius:4px}
+.card-yellow{background:rgba(255,181,0,.07);border:1px solid rgba(255,181,0,.3);border-radius:4px}
+.card-red{background:rgba(239,95,23,.07);border:1px solid rgba(239,95,23,.3);border-radius:4px}
+.card-lblue{background:rgba(49,209,255,.06);border:1px solid rgba(49,209,255,.3);border-radius:4px}
+.kv{display:block;font-size:20px;font-weight:800;color:#fff;line-height:1;font-family:'Consolas','Courier New',monospace}
+.kl{display:block;font-size:8px;color:var(--gray);letter-spacing:1px;text-transform:uppercase;margin-top:3px}
+.kv.g{color:var(--green)}.kv.r{color:var(--orange)}.kv.y{color:var(--yellow)}.kv.b{color:var(--lblue)}
+.ai-box{background:rgba(45,109,246,.07);border:1px solid rgba(45,109,246,.3);border-left:3px solid var(--blue);border-radius:4px;padding:11px 14px;flex-shrink:0}
+.ai-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.ai-lbl{font-size:8px;font-weight:800;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:5px}
+.ai-lbl::before{content:'✦';font-size:9px}
+.ai-txt{font-size:11px;color:rgba(255,255,255,.75);line-height:1.65;overflow:hidden}
+.ai-txt b{color:var(--lblue)}
+.gen-btn{font-family:inherit;background:transparent;border:1px solid rgba(45,109,246,.5);color:var(--blue);font-size:8px;font-weight:800;padding:4px 10px;border-radius:3px;cursor:pointer;letter-spacing:.8px;text-transform:uppercase;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.gen-btn:hover{background:rgba(45,109,246,.12);border-color:var(--blue);color:#fff}
+.gen-btn:disabled{opacity:.3;cursor:not-allowed}
+@keyframes pu{0%,80%,100%{opacity:.25;transform:scale(.75)}40%{opacity:1;transform:scale(1)}}
+.dot{width:5px;height:5px;background:var(--blue);border-radius:50%;animation:pu 1.2s infinite;display:inline-block;margin-right:2px}
+.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+.loading-row{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--dim)}
+.kpi-row{display:flex;align-items:center;justify-content:space-between;padding:7px 9px;background:rgba(255,255,255,.04);border-radius:3px;border-left:2px solid transparent;transition:all .1s;}
+.kpi-row:hover{background:rgba(255,255,255,.07);border-left-color:var(--blue)}
+.kpi-n{font-size:9px;color:var(--gray);font-weight:500}
+.kpi-v{font-size:13px;font-weight:800;color:#fff;font-family:'Consolas',monospace}
+.kpi-v.g{color:var(--green)}.kpi-v.r{color:var(--orange)}.kpi-v.y{color:var(--yellow)}
+.cbox{display:flex;flex-direction:column;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:5px;padding:12px 14px;min-height:0}
+.cbox-t{font-size:8px;font-weight:700;color:var(--gray);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;flex-shrink:0}
+/* S1 COVER */
+#s1{background:var(--deep)}
+#s1 .s-body{display:flex;align-items:center;justify-content:space-between;padding:0 60px}
+.cv-l{flex:1;padding-right:40px}
+.cv-eye{font-size:9px;font-weight:700;color:var(--blue);letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.cv-eye::before{content:'';width:28px;height:2px;background:var(--blue)}
+.cv-title{font-size:66px;font-weight:900;color:#fff;line-height:.92;letter-spacing:-3px;margin-bottom:16px}
+.cv-title em{color:var(--blue);font-style:normal}
+.cv-sub{font-size:13px;color:var(--muted);max-width:440px;line-height:1.7;margin-bottom:36px}
+.cv-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;max-width:480px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+.cv-stat{background:rgba(0,0,0,.2);padding:14px 18px;text-align:center}
+.cv-stat-n{font-size:26px;font-weight:900;color:#fff;display:block;line-height:1}
+.cv-stat-l{font-size:7px;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-top:3px;display:block}
+.cv-r{width:290px;flex-shrink:0;display:flex;flex-direction:column;gap:10px}
+.cv-flags{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cv-flag{aspect-ratio:1;background:rgba(45,109,246,.08);border:1px solid rgba(45,109,246,.2);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .15s;}
+.cv-flag:hover{background:rgba(45,109,246,.18);border-color:var(--blue)}
+.cv-hint{padding:10px 13px;background:rgba(45,109,246,.07);border:1px solid rgba(45,109,246,.25);border-radius:4px;font-size:9px;color:var(--dim);line-height:1.65}
+.cv-hint b{color:var(--blue)}
+/* S2 REGIONAL OVERVIEW */
+#s2 .s-body{padding:14px 22px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.reg-sumbar{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.reg-sum-item{padding:5px 12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:3px;text-align:center}
+.reg-sum-v{font-size:15px;font-weight:900;color:#fff;display:block;line-height:1;font-family:'Consolas',monospace}
+.reg-sum-l{font-size:7px;color:var(--gray);letter-spacing:1px;text-transform:uppercase;display:block;margin-top:2px}
+select.reg-sel{font-family:inherit;background:#060A45;border:1px solid rgba(45,109,246,.5);color:#fff;font-size:11px;font-weight:700;padding:6px 26px 6px 10px;border-radius:4px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath d='M0 0l4.5 5L9 0z' fill='%232D6DF6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;}
+select.reg-sel option{background:#060A45;color:#fff}
+.reg-main{flex:1;display:grid;grid-template-columns:1fr 370px;gap:12px;min-height:0;overflow:hidden}
+.reg-cards{overflow-y:auto;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-content:start}
+.reg-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:5px;padding:11px 12px;cursor:pointer;transition:background .15s;border-left:3px solid rgba(45,109,246,.3)}
+.reg-card:hover{background:rgba(45,109,246,.1);border-left-color:var(--blue)}
+.reg-card-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.reg-card-flag{font-size:22px}
+.reg-card-name{font-size:11px;font-weight:800;color:#fff;line-height:1.15}
+.reg-card-sig{font-size:7px;color:var(--gray);letter-spacing:.5px;text-transform:uppercase;margin-top:1px}
+.reg-card-kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;margin-bottom:6px}
+.reg-kpi-item{text-align:center}
+.reg-kpi-v{font-size:12px;font-weight:900;line-height:1;font-family:'Consolas',monospace}
+.reg-kpi-l{font-size:6px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px}
+.reg-bar-w{height:3px;background:rgba(255,255,255,.07);border-radius:1px;overflow:hidden}
+.reg-bar-f{height:100%;border-radius:1px}
+.reg-right{display:flex;flex-direction:column;gap:8px;overflow:hidden}
+/* S3 MACRO */
+#s3 .s-body{display:grid;grid-template-columns:250px 1fr;height:100%}
+.ms-l{background:rgba(6,10,69,.6);border-right:1px solid rgba(45,109,246,.2);padding:18px 15px;display:flex;flex-direction:column;gap:5px;overflow:hidden}
+.ms-flag{font-size:44px;display:block;line-height:1;margin-bottom:6px}
+.ms-name{font-size:20px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1.1}
+.ms-reg{font-size:8px;font-weight:700;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+.ms-sig{display:inline-flex;margin-top:7px;padding:4px 9px;background:rgba(45,109,246,.12);border:1px solid rgba(45,109,246,.3);border-radius:3px;font-size:9px;font-weight:700;color:var(--lblue);width:fit-content}
+.ms-r{padding:16px 20px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.chart2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ctx-strip{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ctx-box{padding:9px 12px;border-radius:4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09)}
+.ctx-lbl{font-size:7px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+.ctx-txt{font-size:10px;color:var(--muted);line-height:1.55}
+.scorestrip{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.scrd{padding:10px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:4px;border-top:2px solid transparent}
+/* S4 PRICING */
+#s4 .s-body{display:grid;grid-template-columns:1fr 1fr;height:100%;overflow:hidden}
+.pr-l{padding:12px 12px 12px 18px;display:flex;flex-direction:column;gap:7px;border-right:1px solid rgba(45,109,246,.15);overflow:hidden;min-height:0}
+.pr-r{padding:12px 18px 12px 12px;display:flex;flex-direction:column;gap:7px;overflow:hidden;min-height:0}
+.price-hero{background:rgba(45,109,246,.08);border:1px solid rgba(45,109,246,.25);border-radius:5px;padding:11px 15px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ph-lbl{font-size:8px;font-weight:700;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px}
+.ph-val{font-size:36px;font-weight:900;color:#fff;line-height:1;letter-spacing:-2px;font-family:'Consolas',monospace}
+.ph-sub{font-size:10px;color:var(--gray);margin-top:3px}
+.bi-badge{padding:7px 13px;border-radius:4px;font-size:16px;font-weight:900;font-family:'Consolas',monospace}
+.bi-pos{background:rgba(89,173,0,.12);color:var(--green)}
+.bi-neg{background:rgba(255,181,0,.1);color:var(--yellow)}
+.price-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex-shrink:0}
+.bm-rank-lbl{font-size:8px;font-weight:700;color:var(--gray);letter-spacing:.5px;text-transform:uppercase;flex-shrink:0}
+.bm-rank-wrap{flex:1;overflow-y:auto;min-height:0;max-height:none}
+.bm-row{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:3px;transition:background .1s}
+.bm-row:hover{background:rgba(255,255,255,.05)}
+.bm-row.hl{background:rgba(45,109,246,.1)}
+.bm-i{font-size:8px;color:var(--dim);width:14px;text-align:right;flex-shrink:0}
+.bm-f{font-size:13px;flex-shrink:0}
+.bm-n{font-size:9px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bm-bw{width:55px;height:4px;background:rgba(255,255,255,.07);border-radius:1px;overflow:hidden;flex-shrink:0}
+.bm-bf{height:100%;border-radius:1px}
+.bm-v{font-size:9px;font-weight:700;width:30px;text-align:right;flex-shrink:0;font-family:'Consolas',monospace}
+/* S5 GROWTH */
+#s5 .s-body{padding:16px 22px;display:flex;flex-direction:column;gap:10px}
+.q-hdr{display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0}
+.q-title{font-size:17px;font-weight:900;color:#fff;letter-spacing:-.3px}
+.q-sub{font-size:9px;color:var(--gray);margin-top:3px;max-width:380px;line-height:1.5}
+.q-body{flex:1;display:grid;grid-template-columns:1fr 230px;gap:12px;min-height:0}
+.q-chart{position:relative;min-height:0}
+.q-side{display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.regime{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:4px;padding:10px 12px;border-left:3px solid rgba(255,255,255,.15)}
+.regime.hot{border-left-color:var(--orange)}.regime.warm{border-left-color:var(--yellow)}.regime.cool{border-left-color:var(--green)}.regime.hl{background:rgba(45,109,246,.08);border-left-color:var(--blue)}
+.regime-lbl{font-size:8px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px}
+.regime-chips{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+.chip{font-size:8px;padding:2px 5px;border-radius:2px;background:rgba(255,255,255,.06);color:var(--dim);font-weight:600}
+.chip.hl{background:rgba(45,109,246,.12);color:var(--lblue)}
+/* S6 DIGITAL */
+#s6 .s-body{padding:16px 22px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.digi-l,.digi-r{display:flex;flex-direction:column;gap:8px;min-height:0}
+.rank-lbl{font-size:8px;font-weight:700;color:var(--gray);letter-spacing:.5px;text-transform:uppercase;flex-shrink:0}
+.rank-list{display:flex;flex-direction:column;gap:2px;overflow-y:auto;flex:1}
+.rank-row{display:flex;align-items:center;gap:7px;padding:5px 6px;border-radius:3px;transition:background .1s}
+.rank-row:hover{background:rgba(255,255,255,.05)}
+.rank-row.hl{background:rgba(45,109,246,.1)}
+.rank-i{font-size:8px;color:var(--dim);width:14px;text-align:right;flex-shrink:0}
+.rank-f{font-size:13px;flex-shrink:0}
+.rank-n{font-size:9px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-bw{width:65px;height:5px;background:rgba(255,255,255,.07);border-radius:1px;overflow:hidden;flex-shrink:0}
+.rank-bf{height:100%;border-radius:1px;background:var(--blue)}
+.rank-v{font-size:9px;font-weight:700;width:28px;text-align:right;flex-shrink:0;font-family:'Consolas',monospace}
+.digi-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex-shrink:0}
+/* S7 DEMOGRAPHICS */
+#s7 .s-body{padding:16px 22px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.demo-l,.demo-r{display:flex;flex-direction:column;gap:10px}
+.age-spot{background:rgba(45,109,246,.07);border:1px solid rgba(45,109,246,.25);border-radius:5px;padding:18px;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.age-num{font-size:66px;font-weight:900;color:#fff;line-height:1;letter-spacing:-3px;font-family:'Consolas',monospace}
+.age-sub{font-size:8px;color:var(--gray);letter-spacing:1px;text-transform:uppercase;margin-top:3px}
+.age-bw{width:100%;height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin-top:14px}
+.age-bf{height:100%;border-radius:3px;transition:width .8s,background .4s}
+.age-scale{display:flex;justify-content:space-between;width:100%;margin-top:3px}
+.age-scale span{font-size:7px;color:var(--dim)}
+.demo-kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex-shrink:0}
+.prof-box{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:4px;padding:12px 14px;min-height:0;overflow:hidden}
+.prof-lbl{font-size:8px;font-weight:700;color:var(--gray);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+.prof-txt{font-size:10px;color:var(--muted);line-height:1.65}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;flex-shrink:0}
+.cat-box{padding:9px 11px;border-radius:4px}
+.cat-lbl{font-size:7px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+.cat-txt{font-size:9px;color:var(--muted);line-height:1.55}
+.pack-box{padding:9px 11px;background:rgba(89,173,0,.06);border:1px solid rgba(89,173,0,.25);border-radius:4px;flex-shrink:0}
+.pack-lbl{font-size:7px;font-weight:800;color:var(--green);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+.pack-txt{font-size:9px;color:var(--muted);line-height:1.55}
+/* S8 FMCG SIGNAL */
+#s8 .s-body{display:grid;grid-template-columns:320px 1fr;height:100%}
+.sig-l{background:rgba(6,10,69,.6);border-right:1px solid rgba(45,109,246,.2);padding:20px 18px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.sig-r{padding:20px 24px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.sig-badge{display:inline-flex;padding:7px 13px;border-radius:4px;background:rgba(49,209,255,.1);border:1px solid rgba(49,209,255,.35);font-size:11px;font-weight:800;color:var(--lblue);width:fit-content}
+.crit-list{display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.crit{display:flex;gap:8px;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:3px;border-left:2px solid rgba(45,109,246,.3)}
+.crit-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.crit-body{font-size:9px;color:var(--muted);line-height:1.5}
+.crit-body b{color:#fff;font-weight:700}
+.base-ins{padding:9px 11px;background:rgba(255,255,255,.04);border-radius:3px;border-left:2px solid rgba(255,255,255,.12);font-size:9px;color:var(--dim);line-height:1.6;margin-top:auto;flex-shrink:0}
+.sig-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;flex-shrink:0}
+.sig-ai{flex:1;background:rgba(45,109,246,.06);border:1px solid rgba(45,109,246,.2);border-radius:5px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-height:0;overflow:hidden}
+.sig-ai-title{font-size:13px;font-weight:900;color:#fff;letter-spacing:-.3px;line-height:1.2;flex-shrink:0}
+.sig-ai-body{font-size:10px;color:var(--muted);line-height:1.55;height:145px;overflow-y:auto;flex-shrink:0}
+.sig-bottom{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex-shrink:0}
+.sig-sw{padding:10px 12px;background:rgba(255,181,0,.07);border:1px solid rgba(255,181,0,.25);border-radius:4px;min-height:90px}
+.sig-watch{padding:10px 12px;background:rgba(49,209,255,.05);border:1px solid rgba(49,209,255,.25);border-radius:4px;min-height:90px}
+.sig-sub-lbl{font-size:7px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px}
+.sig-sub-txt{font-size:9.5px;color:var(--muted);line-height:1.5}
+/* S9 COMPARE */
+#s9 .s-body{padding:14px 20px;display:flex;flex-direction:column;gap:8px}
+.cmp-row{display:flex;gap:10px;align-items:flex-end;flex-shrink:0}
+.cmp-grp{display:flex;flex-direction:column;gap:2px}
+.cmp-lbl{font-size:7px;font-weight:700;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+select.cmp-sel{font-family:inherit;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#fff;font-size:11px;padding:5px 24px 5px 8px;border-radius:4px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;min-width:150px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath d='M0 0l4.5 5L9 0z' fill='%232D6DF6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;}
+select.cmp-sel option{background:#060A45}
+.cmp-tbl{flex:1;overflow:auto;min-height:0}
+.cmp-chart{height:155px;position:relative;flex-shrink:0}
+/* S10 TAKEAWAYS */
+#s10 .s-body{padding:16px 24px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.tk-hdr{display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tk-cty{display:flex;align-items:center;gap:12px}
+.tk-flag{font-size:32px}
+.tk-name{font-size:17px;font-weight:900;color:#fff;letter-spacing:-.3px}
+.tk-sig{font-size:8px;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+.tk-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;flex-shrink:0}
+.tk-card{border-radius:4px;padding:12px 14px;border:1px solid rgba(255,255,255,.09)}
+.tk-card.c1{background:rgba(45,109,246,.07);border-top:3px solid var(--blue)}
+.tk-card.c2{background:rgba(255,181,0,.06);border-top:3px solid var(--yellow)}
+.tk-card.c3{background:rgba(89,173,0,.06);border-top:3px solid var(--green)}
+.tk-clbl{font-size:8px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.tk-clbl.c1{color:var(--blue)}.tk-clbl.c2{color:var(--yellow)}.tk-clbl.c3{color:var(--green)}
+.tk-ctxt{font-size:10px;color:var(--muted);line-height:1.6}
+.tk-main{flex:1;background:rgba(45,109,246,.05);border:1px solid rgba(45,109,246,.2);border-radius:5px;padding:16px 20px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden}
+.tk-ai-hdr{display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tk-ai-lbl{font-size:8px;font-weight:800;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:5px}
+.tk-ai-lbl::before{content:'✦';font-size:9px}
+.tk-title{font-size:17px;font-weight:900;color:#fff;letter-spacing:-.3px;line-height:1.2;flex-shrink:0}
+.tk-body{font-size:11px;color:var(--muted);line-height:1.75;flex:1;overflow:hidden}
+.tk-bot{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;flex-shrink:0;border-top:1px solid rgba(255,255,255,.08);padding-top:9px}
+.tk-b-lbl{font-size:7px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px}
+.tk-b-txt{font-size:9px;color:var(--muted);line-height:1.55}
+#navbar{flex-shrink:0;height:40px;background:var(--deep);border-top:1px solid rgba(45,109,246,.2);display:flex;align-items:center;justify-content:center;gap:7px;}
+.nav-btn{font-family:inherit;background:rgba(45,109,246,.1);border:1px solid rgba(45,109,246,.3);color:var(--muted);font-size:9px;font-weight:700;padding:5px 15px;cursor:pointer;border-radius:3px;transition:all .15s;letter-spacing:.8px;text-transform:uppercase;}
+.nav-btn:hover{background:var(--blue);border-color:var(--blue);color:#fff}
+.ndot{width:22px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;cursor:pointer;transition:all .18s;}
+.ndot.on{background:var(--blue);width:30px}
+.ndot:hover{background:rgba(255,255,255,.35)}
+.ncount{font-size:9px;color:var(--dim);letter-spacing:.5px;margin:0 6px}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(45,109,246,.35);border-radius:2px}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="topbar">
+  <div class="logo"><div class="logo-sq">NiQ</div><div><span class="logo-name">NielsenIQ</span><span class="logo-tag">Market Insights · 2025</span></div></div>
+  <div class="sep"></div>
+  <div class="ctrl"><span class="ctrl-lbl">Region</span><select class="sel" id="selRegion"></select></div>
+  <div class="ctrl"><span class="ctrl-lbl">Country</span><select class="sel" id="selCountry" style="min-width:175px"></select></div>
+  <div class="ctrl"><span class="ctrl-lbl">KPI Focus</span>
+    <select class="sel" id="selKPI">
+      <option value="0">Overview</option>
+      <option value="3">Macro</option>
+      <option value="4">Pricing</option>
+      <option value="5">Growth</option>
+      <option value="6">Digital</option>
+      <option value="7">Demographics</option>
+    </select>
+  </div>
+  <div class="sep"></div>
+  <button id="ai-btn" onclick="genInsight()">✦ Generate AI Insight</button>
+</div>
+<div id="stage"><div id="scaler"><div id="deck">
+
+<!-- S1 COVER -->
+<div class="slide on" id="s1">
+  <div class="s-hdr"><div class="s-hdr-l"><div class="s-badge">N</div><span class="s-sec">Global Retailer Intelligence · 2025</span></div><span class="s-hdr-r">Confidential · Internal Use Only</span></div>
+  <div class="s-body">
+    <div class="cv-l">
+      <div class="cv-eye">NielsenIQ Strategic Intelligence</div>
+      <div class="cv-title">Global<br><em>FMCG</em><br>Intelligence</div>
+      <div class="cv-sub">43 markets. 5 regions. 7.9 billion consumers.<br>The macro signals shaping where retailers grow, stall, and get disrupted.</div>
+      <div class="cv-stats">
+        <div class="cv-stat"><span class="cv-stat-n">43</span><span class="cv-stat-l">Markets</span></div>
+        <div class="cv-stat"><span class="cv-stat-n">5</span><span class="cv-stat-l">Regions</span></div>
+        <div class="cv-stat"><span class="cv-stat-n">7.9B</span><span class="cv-stat-l">Consumers</span></div>
+        <div class="cv-stat"><span class="cv-stat-n">11</span><span class="cv-stat-l">KPIs</span></div>
+      </div>
+    </div>
+    <div class="cv-r">
+      <div class="cv-flags" id="cvFlags"></div>
+      <div class="cv-hint"><b>How to use:</b> Select region + country above. Use ← → or nav dots to move slides. Click <b>Generate AI Insight</b> for AI-powered retailer analysis.</div>
+    </div>
+  </div>
+  <div class="s-foot"><span>IMF WEO Oct 2025 · The Economist Jan 2026 · World Bank · UN 2025</span><span>1 / 10</span></div>
+</div>
+
+<!-- S2 REGIONAL OVERVIEW -->
+<div class="slide" id="s2">
+  <div class="s-hdr">
+    <div class="s-hdr-l"><div class="s-badge">R</div><span class="s-sec" id="s2-sec">Regional Overview</span></div>
+    <span class="s-hdr-r">Click any market card to drill down</span>
+  </div>
+  <div class="s-body">
+    <div class="reg-sumbar">
+      <select class="reg-sel" id="regSel" onchange="renderRegion()">
+        <option value="APAC">Asia-Pacific</option>
+        <option value="WE">W. Europe</option>
+        <option value="EEMEA">EEMEA</option>
+        <option value="LATAM">Latin America</option>
+        <option value="US">Americas</option>
+      </select>
+      <div id="reg-sums" style="display:flex;gap:7px;flex-wrap:nowrap"></div>
+      <button class="gen-btn" style="margin-left:auto" onclick="genInsight(2)">✦ Generate Regional Insight</button>
+    </div>
+    <div class="reg-main">
+      <div class="reg-cards" id="reg-cards"></div>
+      <div class="reg-right">
+        <div class="cbox" style="flex-shrink:0">
+          <div class="cbox-t" id="reg-chart-t">Region KPIs</div>
+          <div style="position:relative;height:188px"><canvas id="cReg"></canvas></div>
+        </div>
+        <div class="ai-box" style="flex:1;overflow:hidden">
+          <div class="ai-hdr"><span class="ai-lbl" id="reg-ai-lbl">Regional Insight</span></div>
+          <div class="ai-txt" id="ai-reg" style="overflow-y:auto;max-height:180px;font-size:10px;line-height:1.6">Select a region and click <b>Generate Regional Insight</b> for an AI-powered retailer analysis.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="s-foot"><span>IMF WEO Oct 2025 · World Bank · The Economist Jan 2026 · UN 2025</span><span>2 / 10</span></div>
+</div>
+
+<!-- S3 MACRO SNAPSHOT -->
+<div class="slide" id="s3">
+  <div class="s-hdr"><div class="s-hdr-l"><div class="s-badge">1</div><span class="s-sec">Macro Snapshot</span></div><span class="s-hdr-r" id="h3"></span></div>
+  <div class="s-body">
+    <div class="ms-l">
+      <span class="ms-flag" id="s2f">🌐</span>
+      <div class="ms-name" id="s2n">—</div>
+      <div class="ms-reg" id="s2r">—</div>
+      <div class="ms-sig" id="s2sig">—</div>
+      <div id="s2kpis" style="display:flex;flex-direction:column;gap:5px;margin-top:8px"></div>
+    </div>
+    <div class="ms-r">
+      <div class="chart2">
+        <div class="cbox"><div class="cbox-t">GDP Growth vs Inflation vs Region Avg</div><div style="position:relative;height:148px"><canvas id="c2a"></canvas></div></div>
+        <div class="cbox"><div class="cbox-t">E-Commerce vs Urbanization vs Region Avg</div><div style="position:relative;height:148px"><canvas id="c2b"></canvas></div></div>
+      </div>
+      <div class="scorestrip">
+        <div class="scrd" style="border-top-color:var(--blue)"><span class="kv" id="sc2g" style="font-size:17px">—</span><span class="kl">GDP Growth</span></div>
+        <div class="scrd" style="border-top-color:var(--yellow)"><span class="kv" id="sc2i" style="font-size:17px">—</span><span class="kl">Inflation</span></div>
+        <div class="scrd" style="border-top-color:var(--lblue)"><span class="kv" id="sc2e" style="font-size:17px">—</span><span class="kl">E-Commerce</span></div>
+        <div class="scrd" style="border-top-color:var(--green)"><span class="kv" id="sc2bm" style="font-size:17px">—</span><span class="kl">Big Mac $</span></div>
+        <div class="scrd" style="border-top-color:var(--pink)"><span class="kv" id="sc2a" style="font-size:17px">—</span><span class="kl">Median Age</span></div>
+      </div>
+      <div class="ctx-strip">
+        <div class="ctx-box card-blue"><div class="ctx-lbl" style="color:var(--blue)">Market Context</div><div class="ctx-txt" id="s2ctx">—</div></div>
+        <div class="ctx-box" style="background:rgba(49,209,255,.05);border:1px solid rgba(49,209,255,.2)"><div class="ctx-lbl" style="color:var(--lblue)">Retailer Signal</div><div class="ctx-txt" id="s2ins">—</div></div>
+      </div>
+      <div class="ai-box">
+        <div class="ai-hdr"><span class="ai-lbl">Retailer Macro Insight</span><button class="gen-btn" onclick="genInsight(3)">✦ Generate</button></div>
+        <div class="ai-txt" id="ai2">Select a country and click Generate for a dynamic retailer analysis.</div>
+      </div>
+    </div>
+  </div>
+  <div class="s-foot"><span>IMF WEO Oct 2025 · World Bank · UN 2025</span><span>3 / 10</span></div>
+</div>
+
+<!-- S4 PRICING -->
+<div class="slide" id="s4">
+  <div class="s-hdr"><div class="s-hdr-l"><div class="s-badge">2</div><span class="s-sec">Pricing Power &amp; Big Mac Index</span></div><span class="s-hdr-r" id="h4"></span></div>
+  <div class="s-body" style="display:grid;grid-template-columns:1fr 1fr;overflow:hidden;padding:0">
+    <!-- LEFT -->
+    <div style="padding:12px 12px 12px 18px;display:flex;flex-direction:column;gap:7px;border-right:1px solid rgba(45,109,246,.15);overflow:hidden">
+      <div class="price-hero" style="flex-shrink:0;padding:10px 14px">
+        <div><div class="ph-lbl">Big Mac Price</div><div class="ph-val" id="s3bm" style="font-size:34px">—</div><div class="ph-sub">vs US baseline $6.12</div></div>
+        <div class="bi-badge" id="s3bi">—</div>
+      </div>
+      <div class="price-mini" style="flex-shrink:0">
+        <div class="scrd" style="padding:8px 10px;border-top:2px solid var(--lblue)"><span class="kv" id="s3ck" style="font-size:15px">—</span><span class="kl">Coke 2L</span></div>
+        <div class="scrd" style="padding:8px 10px;border-top:2px solid var(--yellow)"><span class="kv" id="s3inf" style="font-size:15px">—</span><span class="kl">Inflation</span></div>
+        <div class="scrd" style="padding:8px 10px;border-top:2px solid var(--blue)"><span class="kv" id="s3gdp" style="font-size:15px">—</span><span class="kl">GDP PPP</span></div>
+      </div>
+      <div class="bm-rank-lbl" style="flex-shrink:0">All 43 Markets — BM Ranking</div>
+      <div class="bm-rank-wrap" id="s3rank" style="height:160px;overflow-y:scroll;flex-shrink:0;min-height:160px;max-height:160px"></div>
+      <div style="flex-shrink:0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:5px;padding:10px 12px">
+        <div class="cbox-t" style="margin-bottom:6px">Big Mac vs Coke 2L — Price Architecture Top 15</div>
+        <div style="position:relative;height:220px"><canvas id="c3b"></canvas></div>
+      </div>
+    </div>
+    <!-- RIGHT -->
+    <div style="padding:12px 18px 12px 12px;display:flex;flex-direction:column;gap:7px;overflow:hidden">
+      <div style="flex-shrink:0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:5px;padding:10px 12px">
+        <div class="cbox-t" style="margin-bottom:6px">Big Mac Price Distribution — All 43 Markets</div>
+        <div style="position:relative;height:155px"><canvas id="c3"></canvas></div>
+      </div>
+      <div class="ai-box" style="height:390px;overflow:hidden;display:flex;flex-direction:column;flex-shrink:0">
+        <div class="ai-hdr" style="flex-shrink:0"><span class="ai-lbl">Pricing Insight for Retailers</span><button class="gen-btn" onclick="genInsight(4)">✦ Generate</button></div>
+        <div class="ai-txt" id="ai3" style="flex:1;overflow-y:auto;min-height:0;font-size:10.5px;line-height:1.6">Generate an AI insight to see pricing strategy and pack-price architecture recommendations for retailers.</div>
+      </div>
+    </div>
+  </div>
+  <div class="s-foot"><span>The Economist Big Mac Index · Jan 2026 · Numbeo/Expatistan</span><span>4 / 10</span></div>
+</div>
+
+<!-- S5 GROWTH & INFLATION -->
+<div class="slide" id="s5">
+  <div class="s-hdr"><div class="s-hdr-l"><div class="s-badge">3</div><span class="s-sec">Growth &amp; Inflation Quadrant</span></div><span class="s-hdr-r" id="h5"></span></div>
+  <div class="s-body">
+    <div class="q-hdr">
+      <div><div class="q-title" id="s4title">Global Growth vs Inflation Map</div><div class="q-sub">Bubble size = population · Highlighted = selected market</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:8px;color:var(--dim);display:flex;align-items:center;gap:3px"><span style="width:7px;height:7px;border-radius:50%;background:var(--orange);display:inline-block"></span>&gt;15% inflation</span>
+        <span style="font-size:8px;color:var(--dim);display:flex;align-items:center;gap:3px"><span style="width:7px;height:7px;border-radius:50%;background:var(--yellow);display:inline-block"></span>7–15%</span>
+        <span style="font-size:8px;color:var(--dim);display:flex;align-items:center;gap:3px"><span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block"></span>&lt;4%</span>
+      </div>
+    </div>
+    <div class="q-body">
+      <div class="q-chart"><canvas id="c4" style="width:100%;height:100%"></canvas></div>
+      <div class="q-side">
+        <div class="regime hl"><div class="regime-lbl" style="color:var(--blue)" id="s4ccl">Selected</div><div style="font-size:9px;color:var(--muted);line-height:1.5" id="s4cct">Select a country</div></div>
+        <div class="regime hot"><div class="regime-lbl" style="color:var(--orange)">🔴 Hyperinflation &gt;15%</div><div class="regime-chips" id="r4hot"></div></div>
+        <div class="regime warm"><div class="regime-lbl" style="color:var(--yellow)">🟡 High Inflation 7–15%</div><div class="regime-chips" id="r4warm"></div></div>
+        <div class="regime cool"><div class="regime-lbl" style="color:var(--green)">🟢 Stable &lt;4% · Invest</div><div class="regime-chips" id="r4cool"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="s-foot"><span>IMF WEO Oct 2025 + Jan 2026 Update</span><span>5 / 10</span></div>
+</div>
+
+<!-- S6 DIGITAL -->
+<div class="slide" id="s6">
+  <div class="s-hdr"><div class="s-hdr-l"><div class="s-badge">4</div><span class="s-sec">Digital Readiness</span></div><span class="s-hdr-r" id="h6"></span></div>
+  <div class="s-body">
+    <div class="digi-l">
+      <div class="rank-lbl">E-Commerce FMCG Ranking — All 43 Markets</div>
+      <div class="rank-list" id="s5rank"></div>
+      <div class="digi-kpis" style="flex-shrink:0;margin-top:6px">
+        <div class="scrd" style="padding:10px 12px;border-top:2px solid var(--blue)"><span class="kv" id="s5ec" style="font-size:22px">—</span><span class="kl">E-Commerce %</span><div style="font-size:8px;color:var(--dim);margin-top:3px" id="s5ecr"></div></div>
+        <div class="scrd" style="padding:10px 12px;border-top:2px solid var(--lblue)"><span class="kv" id="s5ur" style="font-size:22px">—</span><span class="kl">Urbanization %</span><div style="font-size:8px;color:var(--dim);margin-top:3px" id="s5urr"></div></div>
+      </div>
+    </div>
+    <div class="digi-r">
+      <div class="cbox" style="flex-shrink:0"><div class="cbox-t">Urbanization vs E-Commerce</div><div style="position:relative;height:210px"><canvas id="c5"></canvas></div></div>
+      <div class="ai-box" style="flex:1;overflow:hidden">
+        <div class="ai-hdr"><span class="ai-lbl">Digital Insight for Retailers</span><button class="gen-btn" onclick="genInsight(6)">✦ Generate</button></div>
+        <div class="ai-txt" id="ai5" style="overflow-y:auto;max-height:calc(100% - 30px)">Generate an AI insight for digital retail strategy recommendations.</div>
+      </div>
+    </div>
+  </div>
+  <div class="s-foot"><span>Euromonitor / eMarketer / Industry estimates · UN WUP 2025</span><span>6 / 10</span></div>
+</div>
+
+<!-- S7 DEMOGRAPHICS -->
+<div class="slide" id="s7">
+  <div class="s-hdr"><div class="s-hdr-l"><div class="s-badge">5</div><span class="s-sec">Demographics Signal</span></div><span class="s-hdr-r" id="h7"></span></div>
+  <div class="s-body">
+    <div class="demo-l">
+      <div class="age-spot">
+        <span style="font-size:8px;font-weight:700;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">Median Age</span>
+        <div class="age-num" id="s6age">—</div>
+        <div class="age-sub" id="s6agelbl">years</div>
+        <div class="age-bw"><div class="age-bf" id="s6agebar"></div></div>
+        <div class="age-scale"><span>18 — Youngest</span><span>49 — Oldest</span></div>
+      </div>
+      <div class="demo-kpis">
+        <div class="scrd" style="padding:13px;border-top:2px solid var(--blue)"><span class="kv" id="s6pop" style="font-size:20px">—</span><span class="kl">Population M</span></div>
+        <div class="scrd" style="padding:13px;border-top:2px solid var(--orange)"><span class="kv" id="s6un" style="font-size:20px">—</span><span class="kl">Unemployment</span></div>
+      </div>
+      <div class="prof-box">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+          <div class="prof-lbl" style="margin-bottom:0">Retailer Profile</div>
+          <button class="gen-btn" onclick="genInsight(7)" style="font-size:7px;padding:3px 7px">✦ Generate</button>
+        </div>
+        <div class="prof-txt" id="s6prof">—</div>
+      </div>
+      <div class="cat-grid">
+        <div class="cat-box card-blue"><div class="cat-lbl" style="color:var(--blue)">Top Categories</div><div class="cat-txt" id="s6cats">—</div></div>
+        <div class="cat-box card-yellow"><div class="cat-lbl" style="color:var(--yellow)">Channel Priority</div><div class="cat-txt" id="s6chan">—</div></div>
+      </div>
+      <div class="pack-box"><div class="pack-lbl">Pack &amp; Pricing Strategy</div><div class="pack-txt" id="s6pack">—</div></div>
+    </div>
+    <div class="demo-r">
+      <div class="cbox" style="flex:1"><div class="cbox-t">Median Age — All 43 Markets (sorted)</div><div style="position:relative;height:300px"><canvas id="c6"></canvas></div></div>
+      <div class="ai-box" style="flex-shrink:0">
+        <div class="ai-hdr"><span class="ai-lbl">Demographics Insight</span></div>
+        <div class="ai-txt" id="ai6">Click <b>Generate</b> in the Retailer Profile panel for a full AI-powered demographic analysis.</div>
+      </div>
+    </div>
+  </div>
+  <div class="s-foot"><span>UN WPP 2024 · ILO ILOSTAT 2025</span><span>7 / 10</span></div>
+</div>
+
+<!-- S8 FMCG SIGNAL -->
+<div class="slide" id="s8">
+  <div class="s-hdr"><div class="s-hdr-l"><div class="s-badge">6</div><span class="s-sec">FMCG Market Signal</span></div><span class="s-hdr-r" id="h8"></span></div>
+  <div class="s-body">
+    <div class="sig-l">
+      <div>
+        <span id="s7f" style="font-size:36px;display:block;line-height:1;margin-bottom:5px">🌐</span>
+        <div style="font-size:16px;font-weight:900;color:#fff" id="s7n">—</div>
+        <div style="font-size:8px;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px" id="s7r">—</div>
+      </div>
+      <div class="sig-badge" id="s7sig">—</div>
+      <div class="crit-list" id="s7crits"></div>
+      <div class="base-ins" id="s7base">—</div>
+    </div>
+    <div class="sig-r">
+      <div class="sig-kpis">
+        <div class="scrd" style="padding:10px 12px;border-top:2px solid var(--blue)"><span class="kv" id="s7g" style="font-size:16px">—</span><span class="kl">GDP Growth</span></div>
+        <div class="scrd" style="padding:10px 12px;border-top:2px solid var(--yellow)"><span class="kv" id="s7i" style="font-size:16px">—</span><span class="kl">Inflation</span></div>
+        <div class="scrd" style="padding:10px 12px;border-top:2px solid var(--lblue)"><span class="kv" id="s7e" style="font-size:16px">—</span><span class="kl">E-Commerce</span></div>
+        <div class="scrd" style="padding:10px 12px;border-top:2px solid var(--green)"><span class="kv" id="s7bm" style="font-size:16px">—</span><span class="kl">Big Mac $</span></div>
+        <div class="scrd" style="padding:10px 12px;border-top:2px solid var(--pink)"><span class="kv" id="s7gdp" style="font-size:16px">—</span><span class="kl">GDP PPP</span></div>
+        <div class="scrd" style="padding:10px 12px;border-top:2px solid var(--orange)"><span class="kv" id="s7un" style="font-size:16px">—</span><span class="kl">Unemployment</span></div>
+      </div>
+      <div class="sig-ai">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+          <span style="font-size:8px;font-weight:800;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase">✦ AI Strategic Analysis for Retailers</span>
+          <button class="gen-btn" onclick="genInsight(8)">✦ Generate</button>
+        </div>
+        <div class="sig-ai-title" id="ai7t">Click Generate for AI retailer analysis of this market signal</div>
+        <div class="sig-ai-body" id="ai7b">Select a country and click Generate above for a tailored retailer strategy narrative.</div>
+        <div class="sig-bottom">
+          <div class="sig-sw"><div class="sig-sub-lbl" style="color:var(--yellow)">So What for Retailers</div><div class="sig-sub-txt" id="ai7s">Retailer implications will appear after generation.</div></div>
+          <div class="sig-watch"><div class="sig-sub-lbl" style="color:var(--lblue)">Watch Signal</div><div class="sig-sub-txt" id="ai7w">Key indicator will appear after generation.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="s-foot"><span>NielsenIQ Analyst Synthesis · Internal use only</span><span>8 / 10</span></div>
+</div>
+
+<!-- S9 COMPARE -->
+<div class="slide" id="s9">
+  <div class="s-hdr"><div class="s-hdr-l"><div class="s-badge">7</div><span class="s-sec">Market Comparison</span></div><span class="s-hdr-r">Up to 3 markets side by side</span></div>
+  <div class="s-body">
+    <div class="cmp-row">
+      <div class="cmp-grp"><span class="cmp-lbl">Market 1</span><select class="cmp-sel" id="cm1" onchange="renderCmp()"></select></div>
+      <div class="cmp-grp"><span class="cmp-lbl">Market 2</span><select class="cmp-sel" id="cm2" onchange="renderCmp()"></select></div>
+      <div class="cmp-grp"><span class="cmp-lbl">Market 3</span><select class="cmp-sel" id="cm3" onchange="renderCmp()"></select></div>
+      <div style="margin-left:auto"><span class="cmp-lbl">Chart KPI</span>
+        <select class="cmp-sel" id="cmKPI" onchange="renderCmpChart()" style="min-width:155px">
+          <option value="all">All KPIs</option><option value="bm">Big Mac $</option><option value="inf">Inflation %</option>
+          <option value="gr">GDP Growth %</option><option value="ec">E-Commerce %</option>
+          <option value="u">Urbanization %</option><option value="a">Median Age</option><option value="g">GDP PPP $K</option>
+        </select>
+      </div>
+    </div>
+    <div class="cmp-tbl"><div id="cmptbl"></div></div>
+    <div class="cmp-chart"><canvas id="c8"></canvas></div>
+  </div>
+  <div class="s-foot"><span>All sources: IMF, World Bank, UN, The Economist · 2025</span><span>9 / 10</span></div>
+</div>
+
+<!-- S10 TAKEAWAYS -->
+<div class="slide" id="s10">
+  <div class="s-hdr"><div class="s-hdr-l"><div class="s-badge">8</div><span class="s-sec">Insights &amp; Takeaways</span></div><span class="s-hdr-r" id="h10"></span></div>
+  <div class="s-body">
+    <div class="tk-hdr">
+      <div class="tk-cty"><span class="tk-flag" id="s9f">🌐</span><div><div class="tk-name" id="s9n">Select a country</div><div class="tk-sig" id="s9sig">—</div></div></div>
+      <button class="gen-btn" style="padding:9px 18px;font-size:9px" onclick="genInsight(10)">✦ Generate Full Retailer Takeaway</button>
+    </div>
+    <div class="tk-cards">
+      <div class="tk-card c1"><div class="tk-clbl c1">📊 Macro Position</div><div class="tk-ctxt" id="tk1">Select a country to see analysis.</div></div>
+      <div class="tk-card c2"><div class="tk-clbl c2">⚡ Key Tension</div><div class="tk-ctxt" id="tk2">The structural tension will appear here.</div></div>
+      <div class="tk-card c3"><div class="tk-clbl c3">🎯 Priority Action</div><div class="tk-ctxt" id="tk3">The #1 retailer priority action will appear here.</div></div>
+    </div>
+    <div class="tk-main">
+      <div class="tk-ai-hdr">
+        <div class="tk-ai-lbl">AI Retailer Strategic Narrative</div>
+        <div id="tk-loading" style="display:none" class="loading-row"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="font-size:9px">Generating full analysis…</span></div>
+      </div>
+      <div class="tk-title" id="tk-title">Generate a full takeaway to see the complete AI retailer strategy narrative</div>
+      <div class="tk-body" id="tk-body">Click <b style="color:var(--blue)">Generate Full Retailer Takeaway</b> above for a comprehensive retailer strategy analysis.</div>
+      <div class="tk-bot">
+        <div><div class="tk-b-lbl" style="color:var(--yellow)">So What for Retailers</div><div class="tk-b-txt" id="tk-sw">—</div></div>
+        <div><div class="tk-b-lbl" style="color:var(--lblue)">Watch Signal</div><div class="tk-b-txt" id="tk-watch">—</div></div>
+        <div><div class="tk-b-lbl" style="color:var(--green)">Channel Priority</div><div class="tk-b-txt" id="tk-channel">—</div></div>
+        <div><div class="tk-b-lbl" style="color:var(--orange)">Key Risk</div><div class="tk-b-txt" id="tk-risk">—</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="s-foot"><span>NielsenIQ Analytics &amp; Insights APAC · AI-assisted · Internal use only · March 2026</span><span>10 / 10</span></div>
+</div>
+
+</div></div></div>
+<div id="navbar">
+  <button class="nav-btn" onclick="go(-1)">← Prev</button>
+  <div id="ndots"></div>
+  <span class="ncount" id="ncount">1 / 10</span>
+  <button class="nav-btn" onclick="go(1)">Next →</button>
+</div>
+</div>
+<script>
+
+/* ══════════════════════════════════════════════════════════════════════
+   DATA — 43 markets
+══════════════════════════════════════════════════════════════════════ */
+const D=[
+  {r:'US',c:'United States',f:'🇺🇸',p:341,g:89599,bm:6.12,bi:0,ck:2.89,inf:2.7,pc:68,u:83,gr:2.0,un:4.2,a:38.5,ec:31,sig:'Mature / Premium',ins:'AI & tech investment boom driving growth; premiumization and health-conscious shifts; private label gaining on national brands.'},
+  {r:'US',c:'Canada',f:'🇨🇦',p:41,g:65500,bm:5.54,bi:-9.5,ck:2.59,inf:2.1,pc:58,u:82,gr:1.5,un:6.4,a:41.8,ec:28,sig:'Mature / Stable',ins:'Immigration-driven diversity reshaping basket. Discount retailers expanding rapidly.'},
+  {r:'WE',c:'Germany',f:'🇩🇪',p:84,g:73553,bm:7.05,bi:15.2,ck:2.09,inf:2.1,pc:52,u:78,gr:0.2,un:3.5,a:44.8,ec:29,sig:'Mature / Stagnant',ins:'0.2% growth. Aldi/Lidl dominate; private label share >40%. Defense spending could unlock confidence.'},
+  {r:'WE',c:'United Kingdom',f:'🇬🇧',p:68,g:63759,bm:7.08,bi:15.7,ck:2.59,inf:2.8,pc:63,u:84,gr:1.3,un:4.3,a:40.6,ec:33,sig:'Recovering / Premium',ins:'BM $7.08 — 16% above US. Tesco/Sainsbury price wars intensifying. Quick-commerce dominant.'},
+  {r:'WE',c:'France',f:'🇫🇷',p:66,g:66061,bm:7.05,bi:15.2,ck:2.29,inf:0.9,pc:53,u:82,gr:0.7,un:7.5,a:42.3,ec:25,sig:'Mature / Premium',ins:'Lowest inflation in WE at 0.9%. Carrefour/Leclerc dominant. Quality and provenance key.'},
+  {r:'WE',c:'Spain',f:'🇪🇸',p:48,g:56888,bm:7.05,bi:15.2,ck:1.89,inf:2.3,pc:57,u:81,gr:2.9,un:11.2,a:45.3,ec:22,sig:'WE Outperformer',ins:'Spain growing fastest in WE at 2.9%. Mercadona own-label supremacy.'},
+  {r:'WE',c:'Italy',f:'🇮🇹',p:59,g:63126,bm:7.05,bi:15.2,ck:2.09,inf:1.2,pc:60,u:72,gr:0.7,un:6.9,a:48.4,ec:20,sig:'Mature / Slow',ins:'Aging population reshaping basket toward health. Conad and Coop expanding.'},
+  {r:'WE',c:'Switzerland',f:'🇨🇭',p:9,g:97659,bm:9.08,bi:48.4,ck:3.69,inf:0.4,pc:51,u:74,gr:1.3,un:2.5,a:43.1,ec:24,sig:'Premium Niche',ins:'World\'s most expensive Big Mac at $9.08. Migros/Coop duopoly.'},
+  {r:'WE',c:'Netherlands',f:'🇳🇱',p:18,g:84035,bm:7.05,bi:15.2,ck:2.39,inf:2.5,pc:44,u:93,gr:1.0,un:3.8,a:42.8,ec:30,sig:'Mature / Digital',ins:'Albert Heijn dominant; highest WE e-commerce.'},
+  {r:'WE',c:'Sweden',f:'🇸🇪',p:11,g:73070,bm:7.26,bi:18.6,ck:2.69,inf:1.4,pc:46,u:89,gr:1.8,un:8.3,a:41,ec:27,sig:'Mature / Sustainable',ins:'ICA/Axfood lead; sustainability as purchase criterion.'},
+  {r:'EEMEA',c:'Poland',f:'🇵🇱',p:38,g:51060,bm:6.25,bi:2.0,ck:1.69,inf:3.8,pc:51,u:60,gr:3.1,un:2.9,a:42.5,ec:18,sig:'High Growth',ins:'EU fastest-growing large market. Biedronka dominant.'},
+  {r:'EEMEA',c:'Turkey',f:'🇹🇷',p:86,g:43786,bm:5.9,bi:-3.6,ck:1.39,inf:24.7,pc:59,u:77,gr:3.0,un:9.4,a:32.2,ec:17,sig:'Inflation Distorted',ins:'Inflation at 24.7%. Downtrading structural; local brands outperform multinationals.'},
+  {r:'EEMEA',c:'Saudi Arabia',f:'🇸🇦',p:37,g:71538,bm:5.07,bi:-17.2,ck:1.59,inf:1.8,pc:42,u:85,gr:3.8,un:4.7,a:32.4,ec:15,sig:'Expanding Modern',ins:'Vision 2030 driving retail modernization. GDP PPP $71.5K.'},
+  {r:'EEMEA',c:'UAE',f:'🇦🇪',p:10,g:99526,bm:5.17,bi:-15.5,ck:1.79,inf:2.1,pc:35,u:87,gr:5.0,un:2.8,a:33.5,ec:22,sig:'Premium / High Growth',ins:'UAE growing 5.0%. GDP PPP nearly $100K.'},
+  {r:'EEMEA',c:'South Africa',f:'🇿🇦',p:63,g:17250,bm:3.36,bi:-45.1,ck:1.19,inf:3.5,pc:62,u:69,gr:1.1,un:32.8,a:28.1,ec:12,sig:'Dual Economy',ins:'Extreme inequality splits market; sachet economy critical.'},
+  {r:'EEMEA',c:'Egypt',f:'🇪🇬',p:107,g:17350,bm:2.65,bi:-56.7,ck:0.89,inf:13.5,pc:82,u:43,gr:4.1,un:7.1,a:24.1,ec:9,sig:'Volume Growth',ins:'Young population + rapid urbanization = FMCG volume engine.'},
+  {r:'EEMEA',c:'Nigeria',f:'🇳🇬',p:230,g:6420,bm:3.42,bi:-44.1,ck:0.79,inf:17.0,pc:74,u:55,gr:4.2,un:5.0,a:18.1,ec:8,sig:'Frontier / High Potential',ins:'Africa\'s largest consumer base. Sachet economy thriving.'},
+  {r:'EEMEA',c:'Czech Republic',f:'🇨🇿',p:11,g:57640,bm:5.5,bi:-10.1,ck:1.59,inf:2.0,pc:47,u:74,gr:2.0,un:2.7,a:43.3,ec:20,sig:'Converging',ins:'GDP PPP $57.6K — approaching WE levels.'},
+  {r:'EEMEA',c:'Romania',f:'🇷🇴',p:19,g:46820,bm:3.98,bi:-35.0,ck:1.19,inf:4.5,pc:63,u:55,gr:2.5,un:5.5,a:43.6,ec:14,sig:'Fast Modernizing',ins:'Kaufland/Lidl/Carrefour driving modern trade revolution.'},
+  {r:'EEMEA',c:'Kenya',f:'🇰🇪',p:56,g:7200,bm:3.35,bi:-45.3,ck:0.69,inf:4.8,pc:73,u:29,gr:4.8,un:12.7,a:20.1,ec:6,sig:'Frontier / Mobile',ins:'M-Pesa enables digital FMCG. 4.8% GDP growth.'},
+  {r:'EEMEA',c:'Pakistan',f:'🇵🇰',p:240,g:8052,bm:3.86,bi:-36.9,ck:0.59,inf:7.0,pc:80,u:38,gr:3.2,un:6.5,a:22,ec:5,sig:'Large Informal',ins:'90%+ informal retail. Q-commerce emerging.'},
+  {r:'APAC',c:'China',f:'🇨🇳',p:1412,g:27388,bm:3.66,bi:-40.2,ck:1.29,inf:0.2,pc:39,u:67,gr:5.0,un:5.2,a:39.5,ec:42,sig:'Deflationary + Digital',ins:'China 5.0% growth. Sam\'s Club reshaping FMCG value architecture.'},
+  {r:'APAC',c:'Japan',f:'🇯🇵',p:124,g:54815,bm:3.03,bi:-50.5,ck:1.99,inf:2.7,pc:53,u:92,gr:1.1,un:2.5,a:49.1,ec:27,sig:'Mature / Aging',ins:'Super-aged society. Konbini are the FMCG lifeline.'},
+  {r:'APAC',c:'India',f:'🇮🇳',p:1442,g:11860,bm:2.51,bi:-59.0,ck:0.69,inf:3.8,pc:61,u:36,gr:7.3,un:7.8,a:28.4,ec:14,sig:'High Growth Engine',ins:'India grew 7.3% in 2025. Blinkit/Zepto rewriting FMCG last-mile.'},
+  {r:'APAC',c:'Indonesia',f:'🇮🇩',p:280,g:17550,bm:2.52,bi:-58.8,ck:0.79,inf:2.1,pc:55,u:59,gr:4.9,un:5.1,a:30.3,ec:16,sig:'Emerging Powerhouse',ins:'Warung still dominant but Tokopedia/Shopee driving digital FMCG.'},
+  {r:'APAC',c:'South Korea',f:'🇰🇷',p:52,g:60090,bm:3.74,bi:-38.9,ck:2.29,inf:1.5,pc:48,u:82,gr:1.2,un:3.7,a:44.9,ec:36,sig:'Mature / Digital',ins:'World-leading e-commerce (36%). Coupang same-day delivery is the baseline.'},
+  {r:'APAC',c:'Australia',f:'🇦🇺',p:27,g:71431,bm:5.69,bi:-7.0,ck:2.99,inf:2.7,pc:51,u:87,gr:2.1,un:4.1,a:37.9,ec:32,sig:'Mature / Premium',ins:'Woolworths/Coles duopoly controls 65%+. Aldi disrupting.'},
+  {r:'APAC',c:'Thailand',f:'🇹🇭',p:72,g:24930,bm:4.3,bi:-29.7,ck:1.09,inf:0.8,pc:52,u:53,gr:1.6,un:1.1,a:40.1,ec:20,sig:'Slowing Growth',ins:'7-Eleven 14K+ stores anchors convenience channel.'},
+  {r:'APAC',c:'Vietnam',f:'🇻🇳',p:100,g:16050,bm:2.89,bi:-52.8,ck:0.79,inf:3.2,pc:65,u:39,gr:6.5,un:2.3,a:32.5,ec:19,sig:'Fast Growth Frontier',ins:'Vietnam 6.5% growth. Bach Hoa Xanh compressing urbanization-to-modern-trade curve.'},
+  {r:'APAC',c:'Singapore',f:'🇸🇬',p:6,g:161546,bm:5.78,bi:-5.5,ck:2.59,inf:1.8,pc:33,u:100,gr:1.8,un:2.0,a:42.2,ec:35,sig:'Premium City-State',ins:'GDP PPP $161K — highest in dataset. FairPrice + GrabMart + Shopee.'},
+  {r:'APAC',c:'Philippines',f:'🇵🇭',p:118,g:12180,bm:2.84,bi:-53.6,ck:0.69,inf:2.8,pc:74,u:48,gr:5.8,un:3.9,a:25.7,ec:12,sig:'Young & Growing',ins:'Philippines 5.8% growth. Sari-sari stores still 60%+ of FMCG volume.'},
+  {r:'APAC',c:'Malaysia',f:'🇲🇾',p:34,g:40870,bm:3.39,bi:-44.6,ck:0.89,inf:1.8,pc:58,u:79,gr:4.0,un:3.4,a:30.3,ec:22,sig:'Emerging Modern',ins:'99 Speedmart aggressive expansion. Halal as FMCG competitive advantage.'},
+  {r:'APAC',c:'Taiwan',f:'🇹🇼',p:24,g:84760,bm:2.47,bi:-59.6,ck:1.69,inf:1.4,pc:52,u:80,gr:3.3,un:3.5,a:43.3,ec:30,sig:'Undervalued / Tech',ins:'Taiwan BM ($2.47) world\'s cheapest despite $85K GDP PPP.'},
+  {r:'APAC',c:'Hong Kong',f:'🇭🇰',p:7.5,g:83500,bm:4.78,bi:-21.9,ck:2.29,inf:1.8,pc:64,u:100,gr:2.8,un:3.0,a:45.6,ec:38,sig:'Premium / Finance Hub',ins:'GDP PPP $83.5K. 100% urbanized, e-commerce 38% — highest in APAC after China.'},
+  {r:'LATAM',c:'Brazil',f:'🇧🇷',p:217,g:21850,bm:4.45,bi:-27.3,ck:1.79,inf:4.8,pc:63,u:88,gr:2.0,un:7.6,a:34.3,ec:16,sig:'Recovering / Volume',ins:'Atacadao/Assai cash-and-carry transforming retail.'},
+  {r:'LATAM',c:'Mexico',f:'🇲🇽',p:131,g:26080,bm:6.17,bi:0.8,ck:1.29,inf:3.7,pc:66,u:81,gr:1.2,un:2.7,a:29.3,ec:14,sig:'Stable / Strategic',ins:'OXXO 22K+ stores dominant FMCG last-mile.'},
+  {r:'LATAM',c:'Argentina',f:'🇦🇷',p:46,g:25890,bm:5.53,bi:-9.6,ck:1.89,inf:16.4,pc:70,u:92,gr:4.0,un:7.7,a:32.4,ec:15,sig:'Recovery / Inflation',ins:'Milei reforms cut inflation from 60% to 16.4%.'},
+  {r:'LATAM',c:'Colombia',f:'🇨🇴',p:53,g:22150,bm:6.21,bi:1.5,ck:1.09,inf:4.0,pc:68,u:82,gr:2.3,un:10.5,a:31.8,ec:13,sig:'Emerging Growth',ins:'D1/ARA hard discount grew from 0 to 40%+ in 10 years.'},
+  {r:'LATAM',c:'Chile',f:'🇨🇱',p:20,g:31720,bm:5.42,bi:-11.4,ck:1.89,inf:3.2,pc:64,u:88,gr:2.0,un:8.2,a:36.8,ec:18,sig:'Stable / Modern',ins:'Highest modern trade penetration in LATAM.'},
+  {r:'LATAM',c:'Peru',f:'🇵🇪',p:34,g:17290,bm:5.03,bi:-17.8,ck:0.99,inf:2.1,pc:66,u:79,gr:2.7,un:6.1,a:31.5,ec:11,sig:'Steady / Traditional',ins:'Bodegas serve 70%+ of grocery.'},
+  {r:'LATAM',c:'Uruguay',f:'🇺🇾',p:4,g:31850,bm:8.76,bi:43.1,ck:2.29,inf:4.8,pc:66,u:96,gr:3.0,un:7.8,a:36.1,ec:12,sig:'Premium LATAM',ins:'BM $8.76 — second most expensive in world.'},
+  {r:'LATAM',c:'Costa Rica',f:'🇨🇷',p:5,g:28040,bm:6.04,bi:-1.3,ck:1.59,inf:1.0,pc:64,u:82,gr:3.9,un:8.9,a:34.3,ec:10,sig:'Stable Growth',ins:'Lowest inflation in LATAM at 1.0%.'},
+  {r:'LATAM',c:'Guatemala',f:'🇬🇹',p:18,g:12080,bm:4.3,bi:-29.7,ck:0.79,inf:3.4,pc:82,u:53,gr:3.5,un:2.5,a:23.2,ec:5,sig:'Traditional / Informal',ins:'80%+ informal retail (tiendas). Remittances drive spending.'}
+];
+const RL={US:'Americas',WE:'W. Europe',EEMEA:'EEMEA',APAC:'Asia-Pacific',LATAM:'Latin America'};
+const RC={US:'#2D6DF6',WE:'#59AD00',EEMEA:'#EF5F17',APAC:'#31D1FF',LATAM:'#EF5890'};
+
+/* ══════════════════════════════════════════════════════════════════════
+   STATE & CHARTS
+══════════════════════════════════════════════════════════════════════ */
+let CUR = D.find(d=>d.c==='Vietnam');
+let SLIDE = 1;
+const TOTAL = 10;
+const CH = {};
+function dc(id){if(CH[id]){CH[id].destroy();delete CH[id];}}
+
+Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
+Chart.defaults.color='rgba(255,255,255,.45)';
+
+/* ══════════════════════════════════════════════════════════════════════
+   SCALE
+══════════════════════════════════════════════════════════════════════ */
+function scale(){
+  const stage=document.getElementById('stage');
+  const sc=document.getElementById('scaler');
+  const s=Math.min((stage.clientWidth-28)/1280,(stage.clientHeight-28)/720,1);
+  sc.style.transform=`scale(${s})`;
+  sc.style.width='1280px';sc.style.height='720px';
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   NAV
+══════════════════════════════════════════════════════════════════════ */
+function buildNav(){
+  const c=document.getElementById('ndots');c.innerHTML='';
+  for(let i=1;i<=TOTAL;i++){
+    const d=document.createElement('div');
+    d.className='ndot'+(i===SLIDE?' on':'');d.onclick=()=>goTo(i);c.appendChild(d);
+  }
+  document.getElementById('ncount').textContent=SLIDE+' / '+TOTAL;
+}
+function goTo(n){
+  document.getElementById('s'+SLIDE).classList.remove('on');
+  SLIDE=Math.max(1,Math.min(n,TOTAL));
+  document.getElementById('s'+SLIDE).classList.add('on');
+  buildNav();initSlide(SLIDE);
+}
+function go(d){goTo(SLIDE+d);}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' ')go(1);
+  if(e.key==='ArrowLeft')go(-1);
+});
+
+/* ══════════════════════════════════════════════════════════════════════
+   SELECTS
+══════════════════════════════════════════════════════════════════════ */
+function buildSelects(){
+  const rs=document.getElementById('selRegion');
+  rs.innerHTML='<option value="">All Regions</option>'+
+    ['US','WE','EEMEA','APAC','LATAM'].map(r=>`<option value="${r}">${RL[r]}</option>`).join('');
+  rs.onchange=function(){
+    const rf=this.value;
+    const cs=document.getElementById('selCountry');
+    const list=rf?D.filter(d=>d.r===rf):D;
+    cs.innerHTML=list.map(d=>`<option value="${d.c}">${d.f} ${d.c}</option>`).join('');
+    const first=list.find(d=>d.c===CUR.c)||list[0];
+    cs.value=first.c;CUR=D.find(d=>d.c===cs.value);updateAll();
+  };
+  const cs=document.getElementById('selCountry');
+  cs.innerHTML=D.map(d=>`<option value="${d.c}">${d.f} ${d.c}</option>`).join('');
+  cs.value=CUR.c;
+  cs.onchange=function(){CUR=D.find(d=>d.c===this.value);updateAll();};
+  document.getElementById('selKPI').onchange=function(){const n=parseInt(this.value);if(n>0)goTo(n);};
+  const ao=D.map(d=>`<option value="${d.c}">${d.f} ${d.c}</option>`).join('');
+  const an='<option value="">— None —</option>'+ao;
+  document.getElementById('cm1').innerHTML=ao;
+  document.getElementById('cm2').innerHTML=an;
+  document.getElementById('cm3').innerHTML=an;
+  document.getElementById('cm1').value='Vietnam';
+  document.getElementById('cm2').value='India';
+  document.getElementById('cm3').value='China';
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   UPDATE ALL
+══════════════════════════════════════════════════════════════════════ */
+function updateAll(){
+  const d=CUR;
+  ['h3','h4','h5','h6','h7','h8','h10'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=d.f+' '+d.c;});
+  // Clear AI fields
+  [['ai2','Select a country and click Generate for a dynamic retailer analysis.'],
+   ['ai3','Generate an AI insight to see pricing strategy recommendations.'],
+   ['ai5','Generate an AI insight for digital retail strategy recommendations.'],
+   ['ai6','Click Generate in the Retailer Profile panel for a full AI-powered demographic analysis.'],
+   ['ai7t','Click Generate for AI retailer analysis of this market signal'],
+   ['ai7b','Select a country and click Generate above for a tailored retailer strategy narrative.'],
+   ['ai7s','Retailer implications will appear after generation.'],
+   ['ai7w','Key indicator will appear after generation.'],
+   ['tk-title','Generate a full takeaway to see the complete AI retailer strategy narrative'],
+   ['tk-body','Click Generate Full Retailer Takeaway for a comprehensive retailer strategy analysis.'],
+   ['tk-sw','—'],['tk-watch','—'],['tk-channel','—'],['tk-risk','—'],
+  ].forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.textContent=txt;});
+  buildTkCards(d);
+  initSlide(SLIDE);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LAZY SLIDE INIT
+══════════════════════════════════════════════════════════════════════ */
+function initSlide(n){
+  if(n===2)renderRegion();
+  else if(n===3)renderS2();
+  else if(n===4)renderS3();
+  else if(n===5)renderS4();
+  else if(n===6)renderS5();
+  else if(n===7)renderS6();
+  else if(n===8)renderS7();
+  else if(n===9)renderCmp();
+  else if(n===10)renderS9();
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   S2 MACRO
+══════════════════════════════════════════════════════════════════════ */
+function renderS2(){
+  const d=CUR;
+  document.getElementById('s2f').textContent=d.f;
+  document.getElementById('s2n').textContent=d.c;
+  document.getElementById('s2r').textContent=RL[d.r];
+  document.getElementById('s2sig').textContent=d.sig;
+  const kpis=[
+    {n:'GDP PPP',v:'$'+(d.g/1000).toFixed(0)+'K',cls:d.g>60000?'g':d.g>20000?'':''},
+    {n:'GDP Growth',v:d.gr+'%',cls:d.gr>4?'g':d.gr<0?'r':''},
+    {n:'Inflation',v:d.inf+'%',cls:d.inf>15?'r':d.inf>7?'y':'g'},
+    {n:'Big Mac $',v:'$'+d.bm,cls:''},
+    {n:'E-Commerce',v:d.ec+'%',cls:d.ec>30?'g':''},
+    {n:'Urbanization',v:d.u+'%',cls:''},
+    {n:'Median Age',v:d.a+' yrs',cls:''},
+    {n:'Unemployment',v:d.un+'%',cls:d.un>20?'r':d.un>10?'y':''},
+    {n:'Pvt Consump.',v:d.pc+'% GDP',cls:''},
+    {n:'Population',v:d.p+'M',cls:''},
+  ];
+  document.getElementById('s2kpis').innerHTML=kpis.map(k=>
+    `<div class="kpi-row"><span class="kpi-n">${k.n}</span><span class="kpi-v ${k.cls}">${k.v}</span></div>`).join('');
+  // scorecards
+  const set=(id,v,cls)=>{const el=document.getElementById(id);if(el){el.textContent=v;el.className='kv '+cls;el.style.fontSize='17px';}};
+  set('sc2g',d.gr+'%',d.gr>4?'g':d.gr<0?'r':'');
+  set('sc2i',d.inf+'%',d.inf>15?'r':d.inf>7?'y':'g');
+  set('sc2e',d.ec+'%',d.ec>30?'g':'');
+  set('sc2bm','$'+d.bm,'');
+  set('sc2a',d.a+' yrs','');
+  // context strips
+  const reg=D.filter(x=>x.r===d.r);
+  const avg=fn=>(reg.reduce((s,x)=>s+fn(x),0)/reg.length).toFixed(1);
+  const ecR=[...D].sort((a,b)=>b.ec-a.ec).findIndex(x=>x.c===d.c)+1;
+  const gR=[...D].sort((a,b)=>b.g-a.g).findIndex(x=>x.c===d.c)+1;
+  document.getElementById('s2ctx').innerHTML=
+    `<b style="color:#fff">${d.f} ${d.c}</b> ranks <b style="color:var(--lblue)">#${gR}</b>/43 by GDP PPP and <b style="color:var(--lblue)">#${ecR}</b>/43 by e-commerce. Region avg: growth ${avg(x=>x.gr)}% · inflation ${avg(x=>x.inf)}% · e-comm ${avg(x=>x.ec)}%.`;
+  document.getElementById('s2ins').textContent=d.ins;
+  // charts
+  const rg=D.filter(x=>x.r===d.r);
+  const aGr=+(rg.reduce((s,x)=>s+x.gr,0)/rg.length).toFixed(1);
+  const aInf=+(rg.reduce((s,x)=>s+x.inf,0)/rg.length).toFixed(1);
+  const aEc=+(rg.reduce((s,x)=>s+x.ec,0)/rg.length).toFixed(1);
+  const aU=+(rg.reduce((s,x)=>s+x.u,0)/rg.length).toFixed(1);
+  dc('c2a');
+  CH.c2a=new Chart(document.getElementById('c2a'),{type:'bar',data:{labels:['GDP Growth','Inflation'],datasets:[
+    {label:d.c,data:[d.gr,d.inf],backgroundColor:['rgba(45,109,246,.85)','rgba(255,181,0,.8)'],borderRadius:3},
+    {label:'Reg.Avg',data:[aGr,aInf],backgroundColor:'rgba(255,255,255,.15)',borderRadius:3}
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{font:{size:8},boxWidth:7,padding:6,color:'rgba(255,255,255,.5)'}}},
+    scales:{x:{ticks:{font:{size:8}},grid:{display:false}},y:{ticks:{callback:v=>v+'%',font:{size:8}},grid:{color:'rgba(255,255,255,.05)'}}}}});
+  dc('c2b');
+  CH.c2b=new Chart(document.getElementById('c2b'),{type:'bar',data:{labels:['E-Commerce','Urban %'],datasets:[
+    {label:d.c,data:[d.ec,d.u],backgroundColor:['rgba(45,109,246,.85)','rgba(49,209,255,.75)'],borderRadius:3},
+    {label:'Reg.Avg',data:[aEc,aU],backgroundColor:'rgba(255,255,255,.15)',borderRadius:3}
+  ]},options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{font:{size:8},boxWidth:7,padding:6,color:'rgba(255,255,255,.5)'}}},
+    scales:{x:{ticks:{font:{size:8}},grid:{display:false}},y:{ticks:{callback:v=>v+'%',font:{size:8}},grid:{color:'rgba(255,255,255,.05)'}}}}});
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   S3 PRICING
+══════════════════════════════════════════════════════════════════════ */
+function renderS3(){
+  const d=CUR;
+  document.getElementById('s3bm').textContent='$'+d.bm;
+  document.getElementById('s3ck').textContent='$'+d.ck;
+  document.getElementById('s3inf').textContent=d.inf+'%';
+  document.getElementById('s3gdp').textContent='$'+(d.g/1000).toFixed(0)+'K';
+  const bi=document.getElementById('s3bi');
+  bi.textContent=(d.bi>0?'+':'')+d.bi+'%';
+  bi.className='bi-badge '+(d.bi>=0?'bi-pos':'bi-neg');
+  const sorted=[...D].sort((a,b)=>b.bm-a.bm);
+  const maxBm=sorted[0].bm;
+  document.getElementById('s3rank').innerHTML=sorted.map((x,i)=>`
+    <div class="bm-row ${x.c===d.c?'hl':''}">
+      <span class="bm-i">${i+1}</span><span class="bm-f">${x.f}</span>
+      <span class="bm-n" style="${x.c===d.c?'color:#fff;font-weight:700':''}">${x.c}</span>
+      <div class="bm-bw"><div class="bm-bf" style="width:${(x.bm/maxBm*100).toFixed(0)}%;background:${x.c===d.c?'var(--blue)':'rgba(255,255,255,.2)'}"></div></div>
+      <span class="bm-v" style="${x.c===d.c?'color:var(--lblue)':''}">${x.bm}</span>
+    </div>`).join('');
+  // chart 1
+  dc('c3');
+  const bs=[...D].sort((a,b)=>b.bm-a.bm);
+  CH.c3=new Chart(document.getElementById('c3'),{type:'bar',
+    data:{labels:bs.map(x=>x.f),datasets:[{data:bs.map(x=>x.bm),
+      backgroundColor:bs.map(x=>x.c===d.c?'rgba(45,109,246,.9)':'rgba(255,255,255,.15)'),borderRadius:2}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const x=bs[ctx.dataIndex];return[x.c+': $'+x.bm,'BM Index: '+(x.bi>0?'+':'')+x.bi+'%']}}}},
+      scales:{x:{ticks:{font:{size:9}},grid:{display:false}},y:{ticks:{callback:v=>'$'+v,font:{size:8}},grid:{color:'rgba(255,255,255,.05)'}}}}});
+  // chart 2: BM vs Coke top 15
+  dc('c3b');
+  let t15=[...D].sort((a,b)=>b.bm-a.bm).slice(0,14);
+  if(!t15.find(x=>x.c===d.c)){t15.pop();t15.push(d);t15.sort((a,b)=>b.bm-a.bm);}
+  CH.c3b=new Chart(document.getElementById('c3b'),{type:'bar',
+    data:{labels:t15.map(x=>x.f+' '+x.c.split(' ')[0]),
+      datasets:[
+        {label:'Big Mac $',data:t15.map(x=>x.bm),backgroundColor:t15.map(x=>x.c===d.c?'rgba(45,109,246,.9)':'rgba(255,255,255,.2)'),borderRadius:2},
+        {label:'Coke 2L $',data:t15.map(x=>x.ck),backgroundColor:t15.map(x=>x.c===d.c?'rgba(255,181,0,.85)':'rgba(255,255,255,.09)'),borderRadius:2}
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:8},boxWidth:7,padding:5,color:'rgba(255,255,255,.5)'}}},
+      scales:{x:{ticks:{font:{size:8},maxRotation:30},grid:{display:false}},y:{ticks:{callback:v=>'$'+v,font:{size:8}},grid:{color:'rgba(255,255,255,.05)'}}}}});
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   S4 GROWTH
+══════════════════════════════════════════════════════════════════════ */
+function renderS4(){
+  const d=CUR;
+  document.getElementById('s4title').textContent=d.f+' '+d.c+' — Growth vs Inflation Position';
+  document.getElementById('s4ccl').textContent=d.f+' '+d.c;
+  document.getElementById('s4cct').textContent='GDP Growth: '+d.gr+'% · Inflation: '+d.inf+'% · Signal: '+d.sig;
+  document.getElementById('r4hot').innerHTML=D.filter(x=>x.inf>=15).map(x=>`<span class="chip hl">${x.f} ${x.c.split(' ')[0]}</span>`).join('');
+  document.getElementById('r4warm').innerHTML=D.filter(x=>x.inf>=7&&x.inf<15).map(x=>`<span class="chip">${x.f} ${x.c.split(' ')[0]}</span>`).join('');
+  document.getElementById('r4cool').innerHTML=D.filter(x=>x.inf<4&&x.gr>3).map(x=>`<span class="chip hl">${x.f} ${x.c.split(' ')[0]}</span>`).join('');
+  dc('c4');
+  const ds=['US','WE','EEMEA','APAC','LATAM'].map(r=>({
+    label:RL[r],
+    data:D.filter(x=>x.r===r).map(x=>({x:x.gr,y:x.inf,r:Math.max(4,Math.sqrt(x.p)*.85),c:x.c,f:x.f,sig:x.sig})),
+    backgroundColor:D.filter(x=>x.r===r).map(x=>x.c===d.c?'rgba(45,109,246,.9)':RC[r]+'44'),
+    borderColor:D.filter(x=>x.r===r).map(x=>x.c===d.c?'rgba(45,109,246,1)':RC[r]+'88'),
+    borderWidth:D.filter(x=>x.r===r).map(x=>x.c===d.c?2:1),
+  }));
+  CH.c4=new Chart(document.getElementById('c4'),{type:'bubble',data:{datasets:ds},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:7,padding:8,color:'rgba(255,255,255,.5)'}},
+        tooltip:{callbacks:{label:ctx=>[ctx.raw.f+' '+ctx.raw.c,'Growth: '+ctx.raw.x+'%','Inflation: '+ctx.raw.y+'%',ctx.raw.sig]}}},
+      scales:{x:{title:{display:true,text:'GDP Growth %',font:{size:9}},ticks:{callback:v=>v+'%',font:{size:9}},grid:{color:'rgba(255,255,255,.05)'}},
+              y:{title:{display:true,text:'Inflation %',font:{size:9}},ticks:{callback:v=>v+'%',font:{size:9}},grid:{color:'rgba(255,255,255,.05)'}}}}});
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   S5 DIGITAL
+══════════════════════════════════════════════════════════════════════ */
+function renderS5(){
+  const d=CUR;
+  document.getElementById('s5ec').textContent=d.ec+'%';
+  document.getElementById('s5ur').textContent=d.u+'%';
+  const ecR=[...D].sort((a,b)=>b.ec-a.ec).findIndex(x=>x.c===d.c)+1;
+  const urR=[...D].sort((a,b)=>b.u-a.u).findIndex(x=>x.c===d.c)+1;
+  document.getElementById('s5ecr').textContent='#'+ecR+' globally';
+  document.getElementById('s5urr').textContent='#'+urR+' globally';
+  const sorted=[...D].sort((a,b)=>b.ec-a.ec);
+  const maxEc=sorted[0].ec;
+  document.getElementById('s5rank').innerHTML=sorted.map((x,i)=>`
+    <div class="rank-row ${x.c===d.c?'hl':''}">
+      <span class="rank-i">${i+1}</span><span class="rank-f">${x.f}</span>
+      <span class="rank-n" style="${x.c===d.c?'color:#fff;font-weight:700':''}">${x.c}</span>
+      <div class="rank-bw"><div class="rank-bf" style="width:${(x.ec/maxEc*100).toFixed(0)}%;background:${x.c===d.c?'var(--blue)':'rgba(45,109,246,.3)'}"></div></div>
+      <span class="rank-v" style="${x.c===d.c?'color:var(--lblue)':''}">${x.ec}%</span>
+    </div>`).join('');
+  dc('c5');
+  CH.c5=new Chart(document.getElementById('c5'),{type:'bubble',
+    data:{datasets:[{label:'Markets',data:D.map(x=>({x:x.u,y:x.ec,r:Math.max(3,x.g/12000),c:x.c,f:x.f})),
+      backgroundColor:D.map(x=>x.c===d.c?'rgba(45,109,246,.9)':RC[x.r]+'55'),
+      borderColor:D.map(x=>x.c===d.c?'rgba(45,109,246,1)':'transparent'),
+      borderWidth:D.map(x=>x.c===d.c?2:0)}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>[ctx.raw.f+' '+ctx.raw.c,'Urban: '+ctx.raw.x+'%','E-Comm: '+ctx.raw.y+'%']}}},
+      scales:{x:{title:{display:true,text:'Urbanization %',font:{size:9}},ticks:{callback:v=>v+'%',font:{size:9}},grid:{color:'rgba(255,255,255,.05)'}},
+              y:{title:{display:true,text:'E-Commerce %',font:{size:9}},ticks:{callback:v=>v+'%',font:{size:9}},grid:{color:'rgba(255,255,255,.05)'}}}}});
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   S6 DEMOGRAPHICS
+══════════════════════════════════════════════════════════════════════ */
+function renderS6(){
+  const d=CUR;
+  document.getElementById('s6age').textContent=d.a;
+  document.getElementById('s6pop').textContent=d.p+'M';
+  document.getElementById('s6un').textContent=d.un+'%';
+  const pct=((d.a-18)/(49-18)*100).toFixed(0);
+  const col=d.a<28?'#EF5F17':d.a<38?'#FFB500':d.a<45?'#2D6DF6':'#31D1FF';
+  const bar=document.getElementById('s6agebar');
+  bar.style.width=pct+'%';bar.style.background=col;
+  document.getElementById('s6agelbl').textContent=
+    d.a<28?'Young — Volume & Access Market':d.a<38?'Transitional — Emerging Middle Class':d.a<45?'Mature — Premiumization Window':'Aging — Health & Convenience';
+  // Profile (static until AI generates)
+  document.getElementById('s6prof').textContent=
+    d.a<28?'Young consumer base ('+d.a+' yr median) with high-frequency, low-basket shopping. Retailers need strong coverage in informal trade and growing modern formats. Private label penetration low — branded entry-level SKUs dominate. Mobile commerce critical.':
+    d.a<38?'Transitional market ('+d.a+' yr median): middle class expanding, basket diversifying. Modern supermarkets and convenience stores gaining vs traditional trade. Retailers who invest in private label and fresh categories now will lead in 5 years.':
+    d.a<45?'Mature market ('+d.a+' yr median): convenience and quality drive trips. Omnichannel is baseline expectation. Retailers must differentiate on health, wellness, and premium own-brand to defend against hard-discount pressure.':
+           'Aging market ('+d.a+' yr median): smaller trips, higher frequency, health focus. Proximity retail and e-commerce winning over hypermarkets. Retailers should shrink format size and expand health category depth. Premium functional foods are the growth vector.';
+  // category signals
+  document.getElementById('s6cats').textContent=
+    d.a<28?'Beverages · Snacks · Personal care sachets · Instant noodles · Airtime':
+    d.a<38?'FMCG staples · Beverages · Beauty & care · Dairy · Packaged snacks':
+    d.a<45?'Health & wellness · Premium food · Beauty premiumization · Convenience meals':
+           'Functional health · Small-portion premium · OTC health · Convenience meals';
+  document.getElementById('s6chan').textContent=
+    d.ec>30?'Digital-first: platform + dark stores lead · Social commerce growing':
+    d.ec>15?'Omnichannel: modern trade + growing e-comm · Convenience winning':
+    d.u<50?'Traditional trade dominant · Micro-retail · Mobile agents':
+            'Modern trade expanding · Supermarkets + convenience + e-comm mix';
+  document.getElementById('s6pack').textContent=
+    d.bm<3?'Sachet and small-unit essential — BM $'+d.bm+' signals any unit above $0.50 needs a value story. Multi-unit bundling drives attachment.':
+    d.bm<5?'Mid-tier pack range viable — $'+d.bm+' BM allows $1–3 SKUs without heavy justification. Bundle and multipack promotions effective.':
+           'Premium positioning possible — $'+d.bm+' BM signals consumer willingness to pay. Large-format and premium own-brand have clear headroom.';
+  const ageSorted=[...D].sort((a,b)=>a.a-b.a);
+  dc('c6');
+  CH.c6=new Chart(document.getElementById('c6'),{type:'bar',
+    data:{labels:ageSorted.map(x=>x.f),datasets:[{data:ageSorted.map(x=>x.a),
+      backgroundColor:ageSorted.map(x=>x.c===d.c?'rgba(45,109,246,.9)':'rgba(255,255,255,.15)'),borderRadius:2}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>[ageSorted[ctx.dataIndex].c+': '+ageSorted[ctx.dataIndex].a+' yrs',ageSorted[ctx.dataIndex].sig]}}},
+      scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>v+' yrs',font:{size:8}},grid:{color:'rgba(255,255,255,.05)'}}}}});
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   S7 FMCG SIGNAL
+══════════════════════════════════════════════════════════════════════ */
+function renderS7(){
+  const d=CUR;
+  document.getElementById('s7f').textContent=d.f;
+  document.getElementById('s7n').textContent=d.c;
+  document.getElementById('s7r').textContent=RL[d.r];
+  document.getElementById('s7sig').textContent=d.sig;
+  document.getElementById('s7base').textContent=d.ins;
+  const set=(id,v,cls)=>{const el=document.getElementById(id);if(el){el.textContent=v;el.className='kv '+cls;el.style.fontSize='16px';}};
+  set('s7g',d.gr+'%',d.gr>4?'g':d.gr<0?'r':'');
+  set('s7i',d.inf+'%',d.inf>15?'r':d.inf>7?'y':'g');
+  set('s7e',d.ec+'%',d.ec>30?'g':'');
+  set('s7bm','$'+d.bm,'');
+  set('s7gdp','$'+(d.g/1000).toFixed(0)+'K',d.g>60000?'g':'');
+  set('s7un',d.un+'%',d.un>20?'r':d.un>10?'y':'');
+  const crits=[
+    {i:'📊',l:'GDP PPP',v:'$'+(d.g/1000).toFixed(0)+'K',ctx:d.g>60000?'Top-tier wealth':d.g>25000?'Mid-income market':'Emerging economy'},
+    {i:'📈',l:'GDP Growth',v:d.gr+'%',ctx:d.gr>5?'High growth engine':d.gr>2?'Moderate expansion':'Slow / stagnant'},
+    {i:'🔥',l:'Inflation',v:d.inf+'%',ctx:d.inf>15?'Hyperinflation — survival mode':d.inf>7?'High — value war':'Stable pricing env.'},
+    {i:'📱',l:'E-Commerce',v:d.ec+'%',ctx:d.ec>30?'Digital-first market':d.ec>15?'Digital expanding':'Physical dominant'},
+    {i:'👥',l:'Median Age',v:d.a+' yrs',ctx:d.a<28?'Young — volume play':d.a<40?'Transitional':'Aging — health & premium'},
+  ];
+  document.getElementById('s7crits').innerHTML=crits.map(c=>
+    `<div class="crit"><span class="crit-icon">${c.i}</span><div class="crit-body"><b>${c.l}: ${c.v}</b><br>${c.ctx}</div></div>`).join('');
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   S8 COMPARE
+══════════════════════════════════════════════════════════════════════ */
+function renderCmp(){
+  const c1=document.getElementById('cm1').value;
+  const c2=document.getElementById('cm2').value;
+  const c3=document.getElementById('cm3').value;
+  const markets=[c1,c2,c3].filter(Boolean).map(c=>D.find(d=>d.c===c)).filter(Boolean);
+  if(!markets.length)return;
+  const kpis=[
+    {k:'bm',l:'Big Mac $',fmt:v=>'$'+v,best:'max'},
+    {k:'bi',l:'BM Index %',fmt:v=>(v>0?'+':'')+v+'%'},
+    {k:'inf',l:'Inflation %',fmt:v=>v+'%',worst:'max'},
+    {k:'gr',l:'GDP Growth %',fmt:v=>v+'%',best:'max'},
+    {k:'ec',l:'E-Commerce %',fmt:v=>v+'%',best:'max'},
+    {k:'u',l:'Urbanization %',fmt:v=>v+'%'},
+    {k:'a',l:'Median Age',fmt:v=>v+' yrs'},
+    {k:'g',l:'GDP PPP',fmt:v=>'$'+(v/1000).toFixed(0)+'K',best:'max'},
+    {k:'un',l:'Unemployment %',fmt:v=>v+'%',worst:'max'},
+    {k:'p',l:'Population M',fmt:v=>v+'M'},
+    {k:'sig',l:'Signal',fmt:v=>v},
+  ];
+  let html=`<table style="width:100%;border-collapse:collapse;font-size:11px">
+    <tr style="background:rgba(45,109,246,.1)">
+      <th style="padding:7px 12px;text-align:left;font-size:8px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(45,109,246,.2)">KPI</th>
+      ${markets.map(m=>`<th style="padding:7px 12px;text-align:center;font-size:13px;border-bottom:1px solid rgba(45,109,246,.2)">${m.f} ${m.c}</th>`).join('')}
+    </tr>`;
+  kpis.forEach((kpi,i)=>{
+    const vals=markets.map(m=>m[kpi.k]);
+    const nums=vals.filter(v=>typeof v==='number');
+    const bv=kpi.best==='max'?Math.max(...nums):null;
+    const wv=kpi.worst==='max'?Math.max(...nums):null;
+    html+=`<tr style="${i%2?'background:rgba(255,255,255,.02)':''}">
+      <td style="padding:6px 12px;font-size:8px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.5px;text-transform:uppercase">${kpi.l}</td>
+      ${markets.map(m=>{const v=m[kpi.k];const col=bv!==null&&v===bv?'var(--green)':wv!==null&&v===wv&&markets.length>1?'var(--orange)':'#fff';
+        return`<td style="padding:6px 12px;text-align:center;font-weight:700;color:${col};font-family:'Consolas',monospace">${kpi.fmt(v)}</td>`;}).join('')}
+    </tr>`;
+  });
+  html+='</table>';
+  document.getElementById('cmptbl').innerHTML=html;
+  renderCmpChart();
+}
+function renderCmpChart(){
+  const c1=document.getElementById('cm1').value;
+  const c2=document.getElementById('cm2').value;
+  const c3=document.getElementById('cm3').value;
+  const kpi=document.getElementById('cmKPI').value;
+  const markets=[c1,c2,c3].filter(Boolean).map(c=>D.find(d=>d.c===c)).filter(Boolean);
+  if(!markets.length)return;
+  const kM={bm:{fs:['bm'],ls:['Big Mac $'],cs:['#2D6DF6']},inf:{fs:['inf'],ls:['Inflation %'],cs:['#EF5F17']},
+    gr:{fs:['gr'],ls:['GDP Growth %'],cs:['#59AD00']},ec:{fs:['ec'],ls:['E-Commerce %'],cs:['#31D1FF']},
+    u:{fs:['u'],ls:['Urban %'],cs:['#EF5890']},a:{fs:['a'],ls:['Median Age'],cs:['#FFB500']},
+    g:{fs:['g'],ls:['GDP PPP $K'],cs:['#2D6DF6'],xf:v=>(v/1000).toFixed(0)},
+    all:{fs:['bm','inf','gr','ec'],ls:['Big Mac','Inflation','GDP Gr.','E-Comm'],cs:['#2D6DF6','#EF5F17','#59AD00','#31D1FF']}};
+  const cfg=kM[kpi]||kM.all;
+  dc('c8');
+  CH.c8=new Chart(document.getElementById('c8'),{type:'bar',
+    data:{labels:markets.map(m=>`${m.f} ${m.c}`),
+      datasets:cfg.fs.map((f,i)=>({label:cfg.ls[i],data:markets.map(m=>cfg.xf?cfg.xf(m[f]):m[f]),
+        backgroundColor:cfg.cs[i]+'BB',borderRadius:3}))},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:7,padding:8,color:'rgba(255,255,255,.5)'}}},
+      scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{ticks:{font:{size:9}},grid:{color:'rgba(255,255,255,.05)'}}}}});
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   S9 TAKEAWAYS — static cards
+══════════════════════════════════════════════════════════════════════ */
+function buildTkCards(d){
+  document.getElementById('s9f').textContent=d.f;
+  document.getElementById('s9n').textContent=d.c;
+  document.getElementById('s9sig').textContent=d.sig;
+  if(document.getElementById('h10'))document.getElementById('h10').textContent=d.f+' '+d.c;
+  document.getElementById('tk1').textContent=
+    `${d.f} ${d.c} — ${RL[d.r]}. GDP PPP $${(d.g/1000).toFixed(0)}K, growing ${d.gr}%, inflation ${d.inf}%. Signal: ${d.sig}.`;
+  document.getElementById('tk2').textContent=
+    d.inf>15?`Hyperinflation at ${d.inf}% forces basket fragmentation while ${d.gr}% growth creates opposing premiumization pressure. Retailers caught between trading up and trading down simultaneously.`:
+    d.ec>30?`E-commerce at ${d.ec}% is disrupting traditional shelf architecture — brands and retailers without platform-native strategies are losing relevance every quarter.`:
+    d.gr>5?`Rapid ${d.gr}% GDP growth expands the consumer base faster than modern trade infrastructure can keep pace — a distribution race is underway.`:
+    d.a>44?`Median age ${d.a} signals urgent portfolio shift to health and convenience while legacy volume SKUs still dominate shelf space and retailer negotiations.`:
+           `${d.sig} creates tension between short-term volume pressure and the long-term brand equity investment required to defend shelf position.`;
+  document.getElementById('tk3').textContent=
+    d.inf>15?'Lock in value-tier SKUs and localize pricing architecture immediately — basket compression will not wait.':
+    d.ec>30?'Build dedicated e-commerce SKU architecture — dark store assortment logic is fundamentally different from planogram logic.':
+    d.gr>5?'Accelerate distribution investment now — first-mover advantage in emerging modern trade closes in 18–24 months.':
+    d.a>44?'Reformulate top-10 SKUs with functional health claims and shift to smaller, higher-frequency pack formats.':
+           `Invest in brand equity — inflation at ${d.inf}% has opened a premiumization window that historically lasts 18–24 months.`;
+  // pre-fill bottom strip from data
+  document.getElementById('tk-channel').textContent=
+    d.ec>30?'Digital-first: e-commerce + platform commerce + dark stores. Physical shelf still matters but digital is where growth is captured.':
+    d.u<50?'Traditional trade + proximity retail dominant. Invest in route-to-market coverage and micro-retailer activation.':
+           'Modern trade + growing e-commerce hybrid. Win in supermarkets while building digital shelf simultaneously.';
+  document.getElementById('tk-risk').textContent=
+    d.inf>10?'Inflation reacceleration could trigger basket compression and private-label substitution — monitor CPI monthly.':
+    d.gr<2?'GDP slowdown risk — monitor consumer confidence and unemployment; both signal basket size reduction before sales data shows it.':
+           'First-mover advantage closing fast — delayed distribution investment means permanent share loss to early entrants.';
+}
+function renderS9(){buildTkCards(CUR);}
+
+/* ══════════════════════════════════════════════════════════════════════
+   COVER FLAGS
+══════════════════════════════════════════════════════════════════════ */
+function buildCoverFlags(){
+  document.getElementById('cvFlags').innerHTML=
+    D.slice(0,30).map(d=>`<div class="cv-flag">${d.f}</div>`).join('');
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   AI — Anthropic API
+══════════════════════════════════════════════════════════════════════ */
+const GROQ_KEY='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';
+const AURL='https://api.groq.com/openai/v1/chat/completions';
+
+async function callAPI(prompt, maxTokens){
+  maxTokens = maxTokens || 1000;
+  const res = await fetch(AURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + GROQ_KEY
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      max_tokens: maxTokens,
+      temperature: 0.8,
+      messages: [{role: 'user', content: prompt}]
+    })
+  });
+  if(!res.ok){
+    const errText = await res.text();
+    throw new Error('Groq ' + res.status + ': ' + errText.substring(0,150));
+  }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
+
+function setLoading(sn,on){
+  const btn=document.getElementById('ai-btn');
+  btn.disabled=on;btn.textContent=on?'⟳ Generating…':'✦ Generate AI Insight';
+  document.querySelectorAll('.gen-btn').forEach(b=>b.disabled=on);
+  if(sn===10){const el=document.getElementById('tk-loading');if(el)el.style.display=on?'flex':'none';}
+}
+
+async function genInsight(forSlide){
+  const sn = forSlide || SLIDE;
+
+  /* ── REGIONAL INSIGHT (sn===2) ─────────────────────────── */
+  if(sn===2){
+    const aiEl = document.getElementById('ai-reg');
+    const btn  = document.querySelector('#s2 .gen-btn');
+    if(aiEl) aiEl.textContent = 'Analyzing region...';
+    if(btn)  btn.disabled = true;
+    try{
+      const regSel = document.getElementById('regSel');
+      const regCode = regSel ? regSel.value : 'APAC';
+      const regName = RL[regCode] || regCode;
+      const mkt = D.filter(function(x){ return x.r === regCode; });
+      const avg = function(k){ return (mkt.reduce(function(s,x){ return s+x[k]; },0)/mkt.length).toFixed(1); };
+      const topEc = [...mkt].sort(function(a,b){ return b.ec-a.ec; })[0];
+      const topGr = [...mkt].sort(function(a,b){ return b.gr-a.gr; })[0];
+      const topGdp= [...mkt].sort(function(a,b){ return b.g -a.g;  })[0];
+      const lines = mkt.map(function(m){
+        return m.c+' | Growth:'+m.gr+'% | Inflation:'+m.inf+'% | E-Comm:'+m.ec+'% | Signal:'+m.sig;
+      }).join('\n');
+      const prompt =
+        'You are a NielsenIQ senior retail analyst. Write 4-5 sentences for retail leadership.\n\n'
+        +'REGION: '+regName+' ('+mkt.length+' markets)\n'
+        +'Avg Growth: '+avg('gr')+'% | Avg Inflation: '+avg('inf')+'% | Avg E-Comm: '+avg('ec')+'%\n'
+        +'Top E-Commerce: '+topEc.c+' ('+topEc.ec+'%) | Fastest Growth: '+topGr.c+' ('+topGr.gr+'%)\n'
+        +'Highest GDP PPP: '+topGdp.c+' ($'+(topGdp.g/1000).toFixed(0)+'K)\n\n'
+        +'MARKETS:\n'+lines+'\n\n'
+        +'Cover: (1) dominant macro retail trend in '+regName+' 2025 with numbers; '
+        +'(2) top 2-3 markets for retailer growth opportunity and why; '
+        +'(3) most important channel shift across the region; '
+        +'(4) single biggest risk for retail operators. '
+        +'Be specific, use the numbers above.';
+      const res = await fetch(AURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + GROQ_KEY
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          max_tokens: 600,
+          temperature: 0.8,
+          messages: [{role: 'user', content: prompt}]
+        })
+      });
+      if(!res.ok){
+        const et = await res.text();
+        throw new Error('Groq '+res.status+': '+et.substring(0,150));
+      }
+      const json = await res.json();
+      const text = json.choices?.[0]?.message?.content || '';
+      if(aiEl) aiEl.textContent = text || 'No response received.';
+    } catch(e){
+      console.error('Regional insight error:', e);
+      if(aiEl) aiEl.textContent = 'Error: ' + e.message;
+    } finally {
+      if(btn) btn.disabled = false;
+    }
+    return; // Done — don't run country-slide logic
+  }
+
+  /* ── COUNTRY SLIDE INSIGHTS (sn 3–10) ──────────────────── */
+  const d = CUR;
+  setLoading(sn, true);
+
+  const ecR = [...D].sort((a,b)=>b.ec-a.ec).findIndex(x=>x.c===d.c)+1;
+  const gR  = [...D].sort((a,b)=>b.g -a.g ).findIndex(x=>x.c===d.c)+1;
+
+  const data = `RETAILER INTELLIGENCE BRIEF — ${d.c} (${RL[d.r]}) — 2025
+GDP PPP: $${d.g.toLocaleString()} — ranked #${gR}/43 globally (${d.g>60000?'top-tier':d.g>25000?'mid-income':'emerging'})
+Real GDP Growth: ${d.gr}% (${d.gr>5?'HIGH GROWTH ENGINE':d.gr>2?'moderate':'slow growth'})
+CPI Inflation: ${d.inf}% (${d.inf>15?'HYPERINFLATION':d.inf>7?'high inflation':d.inf<1?'DEFLATION RISK':'stable'})
+Big Mac: $${d.bm} vs US $6.12 = ${(d.bi>0?'+':'')+d.bi}% (${Math.abs(d.bi)>40?'severely undervalued':Math.abs(d.bi)>20?'undervalued':d.bi>10?'overvalued':'near parity'})
+Coke 2L: $${d.ck} | E-Commerce FMCG: ${d.ec}% — ranked #${ecR}/43
+Urbanization: ${d.u}% | Median Age: ${d.a} yrs | Population: ${d.p}M
+Unemployment: ${d.un}% | Private Consumption: ${d.pc}% of GDP
+Market Signal: ${d.sig} | Context: ${d.ins}`;
+
+  const focusMap = {
+    3: 'macro context and what it means for retailer revenue, traffic, and basket size',
+    4: 'Big Mac Index pricing position and what it means for retailer pricing architecture, private label strategy, and SKU mix',
+    6: 'e-commerce penetration, digital channel strategy, and what retailers must do in online and omnichannel',
+    7: 'demographic profile and its direct implications for retailer assortment, store format, and category mix',
+    8: 'FMCG market signal classification and strategic retailer portfolio decisions',
+    10:'complete retailer strategy synthesis'
+  };
+  const focus = focusMap[sn] || focusMap[3];
+  const isFull = (sn === 10);
+
+  let prompt;
+  if(isFull){
+    prompt = `You are a NielsenIQ senior retail analyst writing a strategic brief for APAC commercial leadership. Audience: regional retail directors and commercial VPs who need specific, actionable intelligence.\n\n${data}\n\nIMPORTANT: Frame ALL insights from the RETAILER perspective — what retailers (supermarkets, convenience chains, e-commerce platforms, discounters) must do to grow revenue, traffic, and basket size in this market.\n\nWrite a COMPREHENSIVE, DATA-DRIVEN retailer strategic analysis. Each field must be 2-3 substantive sentences minimum.\n\nReturn ONLY valid JSON (no markdown, no backticks):\n{"slide_title":"10-14 word retailer-focused strategic headline capturing the defining opportunity or tension for retail operators in ${d.c} in 2025","narrative":"5-6 complete sentences covering: (1) the macro growth-inflation dynamic and its direct impact on consumer footfall and basket size; (2) what the Big Mac price signals about consumer purchasing power and optimal price positioning for retailer private label vs national brands; (3) e-commerce penetration implications for retailer channel mix — which formats win, which are under threat; (4) demographic profile and what it means for assortment depth, store format size, and category priorities; (5) the single most important structural shift retail operators must make now to capture this market's trajectory. Use specific data points throughout. No generic statements.","so_what":"3 sentences specifically about what retail operators must do differently in ${d.c} vs a generic global retail playbook. Name specific decisions: format strategy, private label investment, category mix, digital shelf, promotional architecture.","watch_signal":"2 sentences identifying the single most important leading indicator for retail operators to track and why a move in this indicator would trigger a change in retail strategy.","macro_card":"2-3 sentences: GDP and inflation dynamics and their direct effect on consumer spending power and retail traffic patterns.","tension_card":"2-3 sentences: the core structural tension for retail operators — what makes this market harder to win than the signal suggests.","action_card":"2-3 sentences: the single #1 action retail operators must take in the next 12 months. Be specific about format, category, channel, and investment priority.","channel_priority":"2 sentences on which retail channel (modern trade, e-commerce, convenience, hard discount, proximity) deserves the most investment and why.","key_risk":"2 sentences on the single biggest risk to retail growth in this market in the next 12 months."}`;
+  } else if(sn===8){
+    prompt = `You are a NielsenIQ retail analyst. Analyze the market signal from a RETAILER perspective — supermarkets, convenience chains, e-commerce platforms, and discounters.\n\n${data}\n\nReturn ONLY valid JSON (no markdown, no backticks):\n{"slide_title":"10-14 word headline explaining what '${d.sig}' means for retail operators in ${d.c} right now","narrative":"4-5 analytical sentences: (1) why this market received '${d.sig}' based on the data and what that means for retail format performance; (2) how consumer shopping behavior — trip frequency, basket size, channel choice — looks day-to-day under this signal; (3) which retail formats are winning (convenience, discount, online) and which are losing share; (4) how the Big Mac at $${d.bm} and e-commerce at ${d.ec}% specifically affect retailer pricing power and channel strategy; (5) the window of opportunity this signal creates for retail operators who move now.","so_what":"3 sentences on retail portfolio decisions — format strategy, category investment, pricing architecture — given this market signal.","watch_signal":"2 sentences: what single data point will most likely change this signal and what does that trigger for retail strategy?"}`;
+  } else if(sn===7){
+    prompt = `You are a NielsenIQ retail analyst. Analyze the demographic profile from a RETAILER perspective — what it means for store format, assortment, category mix, and shopping behavior.\n\n${data}\n\nReturn ONLY valid JSON (no markdown, no backticks):\n{"slide_title":"10-14 word headline about what median age ${d.a} means for retail operators in ${d.c}","narrative":"4-5 analytical sentences focused on: (1) how median age ${d.a} and population ${d.p}M translate into shopping trip behavior — frequency, basket size, category priorities; (2) which store formats win with this demographic and why; (3) what categories must grow vs shrink in retailer assortment to match this demographic reality; (4) how urbanization at ${d.u}% and e-commerce at ${d.ec}% interact with the age profile for channel preference; (5) the private label opportunity given age and income level.","so_what":"3 sentences on specific retailer decisions: which format size to prioritize, which categories to expand, how to structure loyalty and promotions for this demographic.","watch_signal":"2 sentences on the demographic trend that will most change retailer strategy in the next 5 years."}`;
+  } else {
+    prompt = `You are a NielsenIQ retail analyst. Focus your analysis specifically on ${focus}. Frame everything from the RETAILER perspective.\n\n${data}\n\nReturn ONLY valid JSON (no markdown, no backticks):\n{"slide_title":"10-14 word retailer-focused headline specific to ${focus} for ${d.c} in 2025","narrative":"4-5 analytical sentences focused entirely on ${focus} from a retailer strategy perspective. Use specific numbers from the data. Compare to regional or global benchmarks. Explain what this means for retailer revenue, traffic, format, and category decisions — not just what the data shows. Be direct and precise.","so_what":"3 sentences: specific retailer actions — format, pricing, category, channel — given this data. What must retail operators do differently in ${d.c} vs a default global retail strategy?"}`;
+  }
+
+  try{
+    const raw = await callAPI(prompt, 2000);
+    let parsed;
+    try{ parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch(e){ const m=raw.match(/\{[\s\S]*\}/); if(m) parsed=JSON.parse(m[0]); else throw new Error('parse'); }
+    applyInsight(sn, parsed);
+  } catch(err){
+    console.error('API error:', err);
+    applyInsight(sn, buildFallback(sn, d, ecR, gR));
+  } finally {
+    setLoading(sn, false);
+  }
+}
+
+
+function buildFallback(sn,d,ecR,gR){
+  if(sn===2){
+    const aiReg=document.getElementById('ai-reg');
+    if(aiReg)aiReg.textContent='Could not generate regional insight. Please check your connection and try again.';
+    return {slide_title:'',narrative:'',so_what:''};
+  }
+  const pos=d.gr>d.inf?'positive real growth spread':'real purchasing power pressure';
+  return{
+    slide_title:`${d.c} 2025 — ${d.sig}: The Retailer Opportunity Defined`,
+    narrative:`${d.c} posted ${d.gr}% GDP growth against ${d.inf}% inflation — a ${pos} that directly affects consumer footfall and basket sizes across all retail formats. The Big Mac at $${d.bm} (${(d.bi>0?'+':'')+d.bi}% vs US $6.12) benchmarks the consumer price sensitivity threshold: ${d.bm<3?'any SKU priced above $1 needs a compelling value story — retailers must lead with access formats and small-pack pricing':'pricing headroom exists for retailers to invest in premium own-brand development and quality positioning'}. E-commerce at ${d.ec}% (ranked #${ecR}/43) means ${d.ec>30?'the primary retail battleground has moved to platforms and dark stores — physical format excellence alone will not win market share':'physical retail still dominates but digital is growing faster than legacy route-to-market can adapt, and retailers who do not invest now will defend from a weaker position'}. With median age ${d.a} and ${d.u}% urbanization, ${d.a<30?'trip frequency is high but basket values are low — retailers should optimize for access, affordability, and convenience formats':'the sweet spot for retail investment is quality + convenience + digital, as this demographic actively trades up when the offer is right'}. Retail operators who invest in the right format and channel mix today will be structurally advantaged for the next 3–5 years of this market's trajectory.`,
+    so_what:`In ${d.c}, the default global retail playbook fails on ${d.inf>10?'pricing — basket compression requires value-tier private label and small-pack SKUs to lead the range, not sit at the bottom':'channel — '+(d.ec>20?`e-commerce at ${d.ec}% demands dedicated digital SKU architecture and dark store capability, not just a replicated online version of the physical range`:`modern trade coverage must come before consumer premiumization — distribution density matters more than SKU premiumization at this urbanization level`)}. Retailers must ${d.gr>4?`invest ahead of the growth curve — in a ${d.gr}% expansion market, six months of delayed format investment equals permanent share loss to early entrants`:'prioritize private label range expansion now — stable inflation has opened a white space between national brands and hard discount that own-brand can own'}. The category mix needs to shift toward ${d.a<30?'beverages, snacks, and personal care essentials with strong value architecture':'health, convenience, and premium fresh, as this demographic actively seeks quality differentiation'}.`,
+    watch_signal:`Monitor ${d.inf>10?'monthly CPI trajectory — a sustained drop below '+Math.round(d.inf*0.7)+'% triggers the branded premium re-entry window for retail operators':'GDP growth revisions from IMF — any downward revision below '+(d.gr-1.5).toFixed(1)+'% signals consumer confidence deterioration that will manifest as basket size reduction before point-of-sale data confirms it'} over the next 12 months.`,
+    macro_card:`${d.f} ${d.c} — ${RL[d.r]}. GDP PPP $${(d.g/1000).toFixed(0)}K growing ${d.gr}% in 2025. ${d.inf<5?'Stable inflation at '+d.inf+'% creates favorable conditions for retailer investment — real purchasing power is growing and consumers are open to premiumization.':'Inflation at '+d.inf+'% is compressing real purchasing power — retailers must defend basket size through pricing architecture and loyalty investment.'}`,
+    tension_card:`The core tension: ${d.gr>4&&d.ec<20?'rapid '+d.gr+'% economic growth has not been matched by digital infrastructure — retailers investing in modern trade now will capture the e-commerce transition that will follow, but the timing window is narrow':'between current consumer price sensitivity at $'+d.bm+' Big Mac and the growing segment that can and will pay for quality — the market is bifurcating and a single-format strategy cannot win both segments'}. Retailers who do not adapt format strategy now will defend declining positions from a weaker competitive standing.`,
+    action_card:`${d.gr>5?'Accelerate modern trade coverage and convenience format rollout immediately — in a '+d.gr+'% growth market, every quarter of delay equals permanent share loss to first-mover retailers. Secure top-3 city coverage before the window closes in 18–24 months.':d.ec>30?'Build a dedicated digital retail capability — at '+d.ec+'% e-commerce penetration, dark store operations and platform-native assortment are not optional investments, they are table stakes for retail relevance.':'Invest in private label range depth now — stable inflation at '+d.inf+'% has created a quality gap between national brands and hard discount that retailer own-brand can own. This window typically lasts 18–24 months before competitive response.'}`,
+    channel_priority:`${d.ec>25?'Digital commerce and proximity retail are the priority channels — invest in dark store infrastructure and e-commerce assortment depth. Physical supermarkets maintain traffic but basket value growth will come from digital.':'Modern trade expansion (supermarkets + convenience) must lead, with e-commerce as the fast-growing complement. Win the physical shelf first — then build the digital layer on top of established consumer trust.'}`,
+    key_risk:`${d.inf>10?'Inflation reacceleration above '+Math.round(d.inf*1.3)+'% would trigger structural basket compression and private-label substitution — retailers would lose branded category profitability before they could reposition assortment.':'First-mover advantage is closing fast — established local retailers are investing in modern formats and the window for new market entry at scale will narrow significantly within 24 months.'}`
+  };
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   APPLY INSIGHT
+══════════════════════════════════════════════════════════════════════ */
+function applyInsight(sn,p){
+  const t=p.slide_title||'';
+  const n=p.narrative||'';
+  const s=p.so_what||'';
+  const fmt=(title,body,sw)=>
+    `<b style="color:var(--lblue)">${title}</b><br><br>${body}${sw?'<br><br><b style="color:var(--yellow)">Retailers:</b> '+sw:''}`;
+
+  if(sn===2){
+    // Regional insight — output to ai-reg element
+    const aiReg=document.getElementById('ai-reg');
+    if(aiReg){
+      const raw=p.narrative||p.slide_title||'';
+      aiReg.textContent=raw;
+    }
+  } else if(sn===10){
+    document.getElementById('tk-title').textContent=t;
+    document.getElementById('tk-body').textContent=n;
+    document.getElementById('tk-sw').textContent=s;
+    document.getElementById('tk-watch').textContent=p.watch_signal||'—';
+    const ch=document.getElementById('tk-channel');if(ch)ch.textContent=p.channel_priority||'—';
+    const rk=document.getElementById('tk-risk');if(rk)rk.textContent=p.key_risk||'—';
+    if(p.macro_card)document.getElementById('tk1').textContent=p.macro_card;
+    if(p.tension_card)document.getElementById('tk2').textContent=p.tension_card;
+    if(p.action_card)document.getElementById('tk3').textContent=p.action_card;
+  } else if(sn===8){
+    document.getElementById('ai7t').textContent=t;
+    document.getElementById('ai7b').textContent=n;
+    document.getElementById('ai7s').textContent=s;
+    const w=document.getElementById('ai7w');if(w)w.textContent=p.watch_signal||'—';
+  } else if(sn===7){
+    // Demographics: update profile box + insight box
+    document.getElementById('s6prof').textContent=n;
+    document.getElementById('ai6').innerHTML=fmt(t,'',s);
+    // Also update s7 mirror
+    document.getElementById('ai7t').textContent=t;
+    document.getElementById('ai7b').textContent=n;
+    document.getElementById('ai7s').textContent=s;
+  } else {
+    const idMap={3:'ai2',4:'ai3',6:'ai5'};
+    const el=document.getElementById(idMap[sn]);
+    if(el)el.innerHTML=fmt(t,n,s);
+    document.getElementById('ai7t').textContent=t;
+    document.getElementById('ai7b').textContent=n;
+    document.getElementById('ai7s').textContent=s;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   REGIONAL OVERVIEW
+══════════════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════════
+   SLIDE 2 — REGIONAL OVERVIEW
+════════════════════════════════════════════════════════════════════ */
+const RC2={US:'#2D6DF6',WE:'#59AD00',EEMEA:'#EF5F17',APAC:'#31D1FF',LATAM:'#EF5890'};
+const RL2={US:'Americas',WE:'W. Europe',EEMEA:'EEMEA',APAC:'Asia-Pacific',LATAM:'Latin America'};
+
+function renderRegion(){
+  const sel=document.getElementById('regSel');
+  if(!sel)return;
+  const r=sel.value||'APAC';
+  const markets=D.filter(d=>d.r===r);
+  const rname=RL2[r]||r;
+  const s2sec=document.getElementById('s2-sec');
+  if(s2sec)s2sec.textContent=rname+' Overview';
+
+  // Summary stats
+  const avg=k=>+(markets.reduce((s,d)=>s+d[k],0)/markets.length).toFixed(1);
+  const sums=[
+    {l:'Markets',v:markets.length,c:'var(--blue)'},
+    {l:'Avg Growth',v:avg('gr')+'%',c:'var(--green)'},
+    {l:'Avg Inflation',v:avg('inf')+'%',c:'var(--yellow)'},
+    {l:'Avg E-Comm',v:avg('ec')+'%',c:'var(--lblue)'},
+    {l:'Avg Age',v:avg('a')+' yrs',c:'var(--pink)'},
+  ];
+  const sumsEl=document.getElementById('reg-sums');
+  if(sumsEl) sumsEl.innerHTML=sums.map(s=>
+    `<div class="reg-sum-item">
+      <span class="reg-sum-v" style="color:${s.c}">${s.v}</span>
+      <span class="reg-sum-l">${s.l}</span>
+    </div>`).join('');
+
+  // AI label
+  const aiLbl=document.getElementById('reg-ai-lbl');
+  if(aiLbl) aiLbl.textContent=rname+' Retailer Insight';
+
+  // Country cards
+  const maxGr=Math.max(...markets.map(d=>d.gr));
+  const cardsEl=document.getElementById('reg-cards');
+  if(cardsEl) cardsEl.innerHTML=markets.map(d=>{
+    const grCol=d.gr>5?'var(--green)':d.gr>2?'var(--lblue)':'var(--orange)';
+    const infCol=d.inf>15?'var(--orange)':d.inf>7?'var(--yellow)':'var(--green)';
+    const pct=Math.max(5,(d.gr/maxGr*100)).toFixed(0);
+    return `<div class="reg-card" onclick="selectFromRegion('${d.c.replace(/'/g,"\'")}')">
+      <div class="reg-card-top">
+        <span class="reg-card-flag">${d.f}</span>
+        <div>
+          <div class="reg-card-name">${d.c}</div>
+          <div class="reg-card-sig">${d.sig}</div>
+        </div>
+      </div>
+      <div class="reg-card-kpis">
+        <div class="reg-kpi-item"><div class="reg-kpi-v" style="color:${grCol}">${d.gr}%</div><div class="reg-kpi-l">Growth</div></div>
+        <div class="reg-kpi-item"><div class="reg-kpi-v" style="color:${infCol}">${d.inf}%</div><div class="reg-kpi-l">Inflation</div></div>
+        <div class="reg-kpi-item"><div class="reg-kpi-v" style="color:var(--lblue)">${d.ec}%</div><div class="reg-kpi-l">E-Comm</div></div>
+      </div>
+      <div class="reg-bar-w"><div class="reg-bar-f" style="width:${pct}%;background:${grCol}"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px">
+        <span style="font-size:7px;color:var(--dim)">$${(d.g/1000).toFixed(0)}K</span>
+        <span style="font-size:7px;color:var(--dim)">Age ${d.a}</span>
+        <span style="font-size:7px;color:var(--dim)">${d.p}M</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Chart
+  const chartTitle=document.getElementById('reg-chart-t');
+  if(chartTitle) chartTitle.textContent=rname+' — Growth vs Inflation vs E-Commerce';
+  dc('cReg');
+  const canvas=document.getElementById('cReg');
+  if(!canvas)return;
+  CH.cReg=new Chart(canvas,{type:'bar',
+    data:{labels:markets.map(m=>m.f+' '+m.c.split(' ')[0]),
+      datasets:[
+        {label:'GDP Growth %',data:markets.map(m=>m.gr),backgroundColor:RC2[r]+'CC',borderRadius:2},
+        {label:'Inflation %',data:markets.map(m=>m.inf),backgroundColor:'rgba(255,181,0,.7)',borderRadius:2},
+        {label:'E-Comm %',data:markets.map(m=>m.ec),backgroundColor:'rgba(49,209,255,.5)',borderRadius:2},
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:8},boxWidth:7,padding:5,color:'rgba(255,255,255,.5)'}}},
+      scales:{x:{ticks:{font:{size:8},maxRotation:25},grid:{display:false}},
+              y:{ticks:{font:{size:8}},grid:{color:'rgba(255,255,255,.05)'}}}}});
+}
+
+function selectFromRegion(country){
+  CUR=D.find(d=>d.c===country);
+  if(!CUR)return;
+  const cs=document.getElementById('selCountry');
+  if(cs)cs.value=country;
+  const rs=document.getElementById('selRegion');
+  if(rs)rs.value=CUR.r;
+  updateAll();
+  goTo(3);
+}
+
+async function genRegionInsight(){
+  const sel=document.getElementById('regSel');
+  if(!sel)return;
+  const r=sel.value||'APAC';
+  const rname=RL2[r]||r;
+  const markets=D.filter(d=>d.r===r);
+  if(!markets.length)return;
+
+  const btn=document.querySelector('#s2 .gen-btn');
+  const aiEl=document.getElementById('ai-reg');
+  if(btn){btn.disabled=true;btn.textContent='⟳ Generating...';}
+  if(aiEl)aiEl.textContent='Generating '+rname+' retailer analysis...';
+
+  try{
+    // Build prompt as concatenated string to avoid any template literal issues
+    const avg=function(k){return (markets.reduce(function(s,d){return s+d[k];},0)/markets.length).toFixed(1);};
+    const sorted_ec=[...markets].sort(function(a,b){return b.ec-a.ec;});
+    const sorted_gr=[...markets].sort(function(a,b){return b.gr-a.gr;});
+    const sorted_g=[...markets].sort(function(a,b){return b.g-a.g;});
+    const topEc=sorted_ec[0]; const topGr=sorted_gr[0]; const topGdp=sorted_g[0];
+
+    const mkt_lines=markets.map(function(d){
+      return d.c+' | Growth: '+d.gr+'% | Inflation: '+d.inf+'% | E-Comm: '+d.ec+'% | Signal: '+d.sig;
+    }).join('\n');
+
+    const prompt='You are a NielsenIQ senior retail analyst writing for APAC commercial leadership.\n\n'
+      +'REGION: '+rname+' ('+markets.length+' markets)\n'
+      +'Avg GDP Growth: '+avg('gr')+'% | Avg Inflation: '+avg('inf')+'% | Avg E-Commerce: '+avg('ec')+'%\n'
+      +'Top E-Commerce: '+topEc.c+' ('+topEc.ec+'%) | Fastest Growing: '+topGr.c+' ('+topGr.gr+'%) | Highest GDP: '+topGdp.c+' ($'+(topGdp.g/1000).toFixed(0)+'K)\n\n'
+      +'MARKET BREAKDOWN:\n'+mkt_lines+'\n\n'
+      +'Write 4-5 sentences covering: (1) the dominant macro retail trend across '+rname+' in 2025 with specific numbers; '
+      +'(2) which 2-3 markets offer the highest retailer growth opportunity and why; '
+      +'(3) the most important channel shift happening across the region; '
+      +'(4) the single biggest risk retail operators must plan for. '
+      +'Frame for retail leadership. Be specific and use the data above.';
+
+    const text=await callAPI(prompt, 600);
+    if(aiEl)aiEl.textContent=text||'Generation failed.';
+  }catch(e){
+    console.error('Regional insight error:',e);
+    if(aiEl)aiEl.textContent='Error: '+e.message;
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='✦ Generate Regional Insight';}
+  }
+}
+
+
+
+window.onload=function(){
+  buildSelects();
+  buildCoverFlags();
+  buildNav();
+  scale();
+  window.addEventListener('resize',scale);
+  renderRegion();
+  renderS7();
+  buildTkCards(CUR);
+};
+
+</script>
+</body>
+</html>
